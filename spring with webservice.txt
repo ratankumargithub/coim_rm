@@ -1,0 +1,1504 @@
+converting Spring MVC controller bean as Rest Service:-
+=======================================================
+
+--Spring mvc f/w is designed in such a way that we can convert a Controller bean as a REST service easily.
+
+
+--Generally,to make a java class as Restfull WS,we need to use JAX-RS api with one of its implementations i.e (Jersey,REstEasy).
+
+
+--Spring f/w itself has provided API with implementation to make a controller bean as REST service.
+
+
+--In Spring-MVC appl,controller bean returns ModelAndView obj and DS identifies a view with the support of ViewResolver.
+
+--If we make a controller bean as Rest service then it directly returns response to the DS.
+instead of returning ModelAndView it returns Restfull representation objs.
+
+
+--***while returning the response of controller bean to the DS,Spring makes use of "message converters" for converting java objs into JSON or XMl or Vice versa.
+
+
+
+--In order to make controller bean as Restful WS,we use following annotationss and classes:-
+
+
+1.@RestController:- 
+------------------
+
+--it is a new annotation in Spring 4,and this @RestController is a combination of @Controller and @ResponseBody annotation.
+
+
+--prior to spring 4,we used to write @Controller on the top of the class and @ResponseBody on the top of the each method.
+
+--from Spring 4,we use @RestController on the top of the class in place of both annotations.
+
+
+
+
+2.@PathVariable:-
+-----------------
+
+--it is used to inject 'request url path variable value' to the method parameter.
+
+simillar to @PathParam in Rest api.
+
+
+  
+
+3.@RequestBody:-
+----------------
+
+--this annotation is used to inject body part of HttpRequest into a java class obj by converting request body as java class obj.
+
+
+
+Note:- @RequestBody and @ResponseBody annotations r used to bind the Http req/resp body to the domain obj in method parameter or return type,behind the scenes,these annotations uses 
+"Http Message contervers" to converts the body of HTTP req/resp to the domain obj.
+
+--here "Accept" header of Http Req is used by clients(browser) to tell the server what is the req content type is.
+
+--the servet sends back the resposne,with Http Response header "Content-Type" tell the client what the content type of returned content is.
+
+
+
+Spring need help to convert the request body into user object. It needs a converter which can convert the data in HTTP request body [which can be JSON/XML/Other] into user object.
+
+Spring provides many inbuilt HttpMessageConverters, which will be used for conversion, depending on presence of certain library in project classpath.
+
+For example, if the Content-Type in response Header was one of application/json or application/xml , that means the POST body contains json or XML[Popular formats], and if Jackson library is found in  classpath, Spring will delegate the conversion to MappingJackson2HttpMessageConverter [for json] or MappingJackson2XmlHttpMessageConverter [for xml].
+
+To declare a dependency to Jackson library (jackson-databind) include following dependency in pom.xml
+
+
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.2.0</version>
+</dependency>
+
+
+--for xml no need to add any extra dependency just @XmlRootElement at class level and @XmlElement annotation at getter method is enough.
+
+
+NOTE : As from Spring 4, @RestController is the preferred way to achieve the same functionality earlier provided by @ResponseBody. Under the hood, @RestController is @Controller+@ResponseBody, and it avoids the need of prefixing every method with @ResponseBody.
+
+
+
+
+4.MediaType:-
+------------
+
+--this class is used to specify the media type that req mapping method consumes or produces.
+
+
+
+5.ResponseEntity:-
+------------------
+
+--it is a generic class,it is used as return type for request mapping methods.
+
+simmilar to Response obj in Rest api.
+
+
+
+
+Note:- unlike Rest api's @GET,@Produces,@Consume annotations, in Spring Rest we use these as a @RequestMapping annotation's attributes...
+
+ex:-
+
+@RestController
+public class MyController {
+
+@RequestMapping(value="getMsg",method=RequestMethod.GET,produces=MediaType.APPLICATION_XML_VALUE)
+	public StudentBean getMsg(){
+		
+		StudentBean sb=new StudentBean(100, "Rama", 500);
+			
+		
+		return sb;
+	}
+
+}
+
+
+here Spring-Rest api automatically converts return type in xml format/json format based on jar file added in the class path.if we r using xml type then in bean class @XmlRootElement and @XmlElement(JAX_B related tags) must be there.
+
+
+
+exApp1:- producing StudentBean obj as JSON obj.
+===============================================
+
+
+SpringRestApp2:-
+	|
+	|--com.ratan.spring.ws.beans
+	|			|--StudentBean.java
+	|
+	|--com.ratan.spring.ws.controller
+					|--MyController.java
+
+	|--WebContent
+		|--WEB-INF
+			|--applicationContext.xml
+			|--web.xml
+			|--ds-servlet.xml
+		|--pom.xml
+
+
+
+
+
+pom.xml:-
+-------
+ <dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>4.2.5.RELEASE</version>
+</dependency>
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.2.0</version>
+</dependency>
+
+
+
+Note:- with spring 5 the above jacson dependency will not work...we need to work with following dependencies:-
+
+
+<dependency>
+       <groupId>com.fasterxml.jackson.core</groupId>
+       <artifactId>jackson-databind</artifactId>
+       <version>2.9.0</version>
+</dependency>
+
+
+
+
+
+
+StudentBean.java:-
+-----------------
+
+
+package com.ratan.spring.ws.beans;
+
+import java.io.Serializable;
+
+public class StudentBean implements Serializable {
+
+	
+	private int roll;
+	
+	private String name;
+	
+	private int marks;
+	
+	public StudentBean() {
+		
+	}
+
+	
+	public int getRoll() {
+		return roll;
+	}
+
+	public void setRoll(int roll) {
+		this.roll = roll;
+	}
+
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
+	public StudentBean(int roll, String name, int marks) {
+		super();
+		this.roll = roll;
+		this.name = name;
+		this.marks = marks;
+	}	
+}
+
+
+
+
+
+MyController.java:-
+------------------
+
+package com.ratan.spring.ws.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ratan.spring.ws.beans.StudentBean;
+
+
+@RestController
+public class MyController {
+
+	@RequestMapping(value="getMsg",method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE)
+	public StudentBean getMsg(){
+		
+		StudentBean sb=new StudentBean(100,"Rama",500);
+		return sb;
+	}
+	
+	
+}
+
+
+
+//or
+
+
+MyController.java:-(with ResponseEntity)
+------------------
+
+
+@RestController
+public class MyController {
+
+	@RequestMapping(value="getMsg",method=RequestMethod.GET,produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<StudentBean> getMsg(){
+		
+		StudentBean sb=new StudentBean(100, "Rama", 500);
+		
+		return new ResponseEntity<StudentBean>(sb,HttpStatus.OK);	
+	}	
+}
+
+
+
+
+
+
+
+
+
+web.xml:-
+---------
+
+<web-app>
+   
+   <servlet>
+   
+   <servlet-name>ds</servlet-name>
+   <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+   <load-on-startup>1</load-on-startup>
+   </servlet>
+   
+   <servlet-mapping>
+   <servlet-name>ds</servlet-name>
+   <url-pattern>/rest/*</url-pattern>
+   </servlet-mapping>
+   
+   <listener>
+   <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+   </listener>
+   
+   <context-param>
+   <param-name>contextConfigLocation</param-name>
+   <param-value>/WEB-INF/applicationContext.xml</param-value>
+   </context-param>
+   
+</web-app>
+
+
+ds-servlet.xml:-
+----------------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+    
+<mvc:annotation-driven />
+
+<context:component-scan base-package="com.ratan.spring.ws.controller" />
+
+</beans>
+
+
+
+applicationContext.xml:-
+------------------------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+
+</beans>
+
+
+
+
+
+exApp2:- producing StudentBean obj as JSON obj and consuming StudentBean as XMl(single xml obj) .
+================================================================================
+
+
+simillar to above application just change the StudentBean.java and MyController.java class.
+
+
+StudentBean.java:-(just add the xml related Annotations.)
+------------------
+
+package com.ratan.spring.ws.beans;
+
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+public class StudentBean implements Serializable {
+
+	
+	private int roll;
+	
+	
+	private String name;
+	
+	
+	private int marks;
+	
+	public StudentBean() {
+		// TODO Auto-generated constructor stub
+	}
+
+	@XmlElement
+	public int getRoll() {
+		return roll;
+	}
+
+	public void setRoll(int roll) {
+		this.roll = roll;
+	}
+
+	@XmlElement
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@XmlElement
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
+	public StudentBean(int roll, String name, int marks) {
+		super();
+		this.roll = roll;
+		this.name = name;
+		this.marks = marks;
+	}	
+}
+
+
+
+
+MyController.java:-
+-------------------
+
+package com.ratan.spring.ws.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ratan.spring.ws.beans.StudentBean;
+
+
+@RestController
+public class MyController {
+
+	@RequestMapping(value="getMsg",method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE,
+			consumes=MediaType.APPLICATION_XML_VALUE)
+	public StudentBean getMsg(@RequestBody StudentBean sb){
+	
+		return sb;	
+	}	
+}
+
+
+
+Note:- run the above application with postman as POST request and add student data as xml in body as follows:-
+
+
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<studentBean>
+
+    <marks>500</marks>
+
+    <name>Rama</name>
+
+    <roll>100</roll>
+
+</studentBean>
+
+
+
+
+exApp3:- producing List<StudentBean> obj as JSON obj and consuming StudentBean as XMl(single xml obj) .
+=======================================================================================
+
+
+simmilar to the above application,just change the MyController.java:-
+
+MyController.java:-
+-------------------
+
+package com.ratan.spring.ws.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ratan.spring.ws.beans.StudentBean;
+
+
+@RestController
+public class MyController {
+
+	@RequestMapping(value="getMsg",method=RequestMethod.POST,produces=MediaType.APPLICATION_JSON_VALUE,
+			consumes=MediaType.APPLICATION_XML_VALUE)
+	public List<StudentBean> getMsg(@RequestBody StudentBean sb){
+	
+		List<StudentBean> students=new ArrayList<StudentBean>();
+		
+		students.add(sb);
+		StudentBean sb2=new StudentBean(200, "Hari", 800);
+		StudentBean sb3=new StudentBean(210, "Mohan", 850);
+		students.add(sb2);
+		students.add(sb3);
+				
+		return students;	
+	}	
+}
+
+
+
+
+
+
+****
+exApp4:- producing List<StudentBean> obj as xml obj(multiple xml obj) 
+======================================================================
+
+
+here we need to create another class as Students.java in addition to StudentBean.java:-
+
+--remaining same as above applicaitons
+
+ex:-
+
+
+StudentBean.java:-
+-----------------
+
+package com.ratan.spring.ws.beans;
+
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+public class StudentBean implements Serializable {
+
+	private int roll;
+	
+	private String name;
+		
+	private int marks;
+	
+	public StudentBean() {
+
+	}
+
+	@XmlElement
+	public int getRoll() {
+		return roll;
+	}
+
+	public void setRoll(int roll) {
+		this.roll = roll;
+	}
+
+	@XmlElement
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@XmlElement
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
+	public StudentBean(int roll, String name, int marks) {
+		super();
+		this.roll = roll;
+		this.name = name;
+		this.marks = marks;
+	}	
+}
+
+
+Students.java:-
+--------------
+
+package com.ratan.spring.ws.beans;
+
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+public class Students {
+
+	List<StudentBean> student;
+
+	public Students(List<StudentBean> student) {
+		super();
+		this.student = student;
+	}
+	
+	public Students() {
+
+	}
+
+	@XmlElement
+	public List<StudentBean> getStudent() {
+		return student;
+	}
+
+	public void setStudent(List<StudentBean> student) {
+		this.student = student;
+	}	
+}
+
+
+
+MyController.java:-
+-------------------
+
+package com.ratan.spring.ws.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ratan.spring.ws.beans.StudentBean;
+import com.ratan.spring.ws.beans.Students;
+
+
+@RestController
+public class MyController {
+
+	@RequestMapping(value="getMsg",method=RequestMethod.POST,produces=MediaType.APPLICATION_XML_VALUE)
+	public Students getMsg(){
+	
+		List<StudentBean> students=new ArrayList<StudentBean>();
+		
+		StudentBean sb2=new StudentBean(200, "Hari", 800);
+		StudentBean sb3=new StudentBean(210, "Mohan", 850);
+		
+		students.add(sb2);
+		students.add(sb3);
+		
+		Students st=new Students(students);
+		
+		return st;	
+	}	
+}
+
+
+
+
+
+
+
+****
+exApp5:- consume the List<StudentBean> obj as xml obj(multiple xml obj) and produce the json obj:- 
+================================================================================================
+
+--similar to above applicaiton just change the MyController.java class:-
+
+MyController.java:-
+------------------
+
+package com.ratan.spring.ws.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ratan.spring.ws.beans.Students;
+
+
+@RestController
+public class MyController {
+
+	@RequestMapping(value="getMsg",method=RequestMethod.POST,consumes=MediaType.APPLICATION_XML_VALUE,produces=MediaType.APPLICATION_JSON_VALUE)
+	public Students getMsg(@RequestBody Students students){
+	
+		return students;	
+	}	
+}
+
+
+
+
+
+
+
+
+
+
+
+Spring-Rest Client:-
+====================
+
+--We can create a client application of RestFull web service with "RestTemplate" class of Spring-Rest api,by using URL of web-service.
+
+--"RestTemplate" class is given by spring f/w to access the Restfull webservice in easy manner.
+
+--RestTemplate class is not only for calling a Spring REST service,it can be used to call any REST service.
+
+
+--RestTemplate class has 4 important methods:-
+
+1.getForObject(url,Class response type)
+
+2.postForObject(url,Object o,Class response type);
+
+3.put(url,Object o);
+
+4.delete(url,Class resposne type);
+
+
+ex:-
+
+exApp1 :-Produsing JSON and and consuming JSON .
+
+
+
+@RequestBody is used to inject consuming obj as a parameter .
+
+
+Spring 5:- ex:-
+==============
+
+
+ex1:= producing JSon obj:-
+
+
+
+MyController.java:-
+------------------
+
+
+
+@RestController
+public class MyController {
+
+	
+	@RequestMapping(value = "/home", method=RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<Student> fun1(){
+		
+		
+		List<Student> slist=new ArrayList<Student>();
+		
+		slist.add(new Student(110, "Rahul", 860));
+		slist.add(new Student(120, "Ramesh", 960));
+		
+		
+		return slist;
+	}
+	
+
+	
+}
+
+
+
+Client app:-
+------------
+
+
+public class Test {
+
+	public static void main(String[] args) {
+		
+		RestTemplate rt=new RestTemplate();
+		
+		Student s=new Student(100, "Ram", 500);
+	
+		
+		 String ss=rt.getForObject("http://localhost:8080/springrestapi/home", String.class);
+		
+		 System.out.println(ss);
+	}
+
+}
+
+
+
+
+ex2:=Produsing JSON obj and consuming JSON obj
+
+
+MyController.java:-
+-------------------
+
+
+@RestController
+public class MyController {
+
+	
+	@RequestMapping(value = "/home", method=RequestMethod.POST,produces = 		MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
+	public List<Student> getMsg(@RequestBody Student s){
+		
+		//Student sb=new Student(100,"Rama",500);
+		s.setName("Ramesh...");
+		
+		List<Student> slist=new ArrayList<Student>();
+		slist.add(s);
+		slist.add(new Student(110, "Rahul", 860));
+		
+		
+		return slist;
+	}
+	
+}
+
+
+
+in client side:-
+----------------
+
+at client app Dependecy would be :-
+
+
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>5.2.0.RELEASE</version>
+</dependency>
+  
+  <dependency>
+       <groupId>com.fasterxml.jackson.core</groupId>
+       <artifactId>jackson-databind</artifactId>
+       <version>2.9.0</version>
+</dependency>
+
+
+
+
+Test.java:-
+-----------
+
+
+public class Test {
+
+	public static void main(String[] args) {
+		
+		RestTemplate rt=new RestTemplate();
+		
+		Student s=new Student(100, "Ram", 500);
+	
+		
+ String ss=rt.postForObject("http://localhost:8080/springrestapi/home",s , String.class);
+		
+		 System.out.println(ss);
+	}
+
+}
+
+
+
+
+with Path parameter:-
+--------------------
+
+
+MyController.java:-
+-----------------
+
+
+
+@RestController
+public class MyController {
+
+	
+	@RequestMapping(value = "/home{r}", method=RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<Student> fun1(@PathVariable("r") int roll ){
+		
+		
+		List<Student> slist=new ArrayList<Student>();
+		
+		slist.add(new Student(roll, "Rahul", 860));
+		slist.add(new Student(roll+1, "Ramesh", 960));
+		
+		
+		return slist;
+	}
+	
+
+	
+}
+
+
+
+Client App:-
+=============
+
+
+Test.java:-
+----------
+
+
+public class Test {
+
+	public static void main(String[] args) {
+		
+		RestTemplate rt=new RestTemplate();
+		
+	
+		Map<String,Integer> params=new HashMap<String, Integer>();
+		
+		params.put("r", 500);
+		
+		
+		 String ss=rt.getForObject("http://localhost:8080/springrestapi/home{r}", String.class,params);
+		
+		 System.out.println(ss);
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exApp2:- create a Spring-Rest service which get student roll as URL path variable and returns the details of that student as XML with Rest-Spring client app:-
+====================================================================================================
+
+MyController.java:-
+-------------------
+
+package com.ratan.spring.ws.controller;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ratan.spring.ws.beans.StudentBean;
+
+
+@RestController
+public class MyController {
+
+	@RequestMapping(value="getStudent/{roll}",method=RequestMethod.GET,produces=MediaType.APPLICATION_XML_VALUE)
+	public StudentBean getMsg(@PathVariable("roll") int roll){
+	
+		//call the service class which fetch the details of Student with the help of dao class.
+		
+		//dummy student details;
+		
+		StudentBean student=new StudentBean(roll, "rama", 800);
+		return student;
+		
+	}	
+}
+
+
+
+RestClient.java:-
+-----------------
+
+package com.ratan.spring.ws.client;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.web.client.RestTemplate;
+
+public class RestClient {
+
+	public static void main(String[] args) {
+		
+		String url="http://localhost:8085/SpringRestApp2/rest/getStudent/{roll}";
+		
+		RestTemplate template=new RestTemplate();
+		
+		Map<String, Object> map=new HashMap<String, Object>();
+		map.put("roll", 100);
+		
+		String res=template.getForObject(url, String.class, map);
+		
+		System.out.println(res);	
+	}	
+}
+
+
+
+
+
+Diff bt getForObject() and getForEntity:- with Entity we can send the headers details also.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Making Spring Bean as Restfull Service:-(with jersey implementation)(Jersey 1.x) with web.xml
+==============================================================================================
+
+
+--Jeresy has provided Rest Api implementation in Spring flavour also:-
+
+
+exApp:-
+
+create a dynamic web application and convert it as Maven project.
+
+
+add the following dependency in pom.xml file:
+
+
+<!-- https://mvnrepository.com/artifact/com.sun.jersey/jersey-server -->
+<dependency>
+    <groupId>com.sun.jersey</groupId>
+    <artifactId>jersey-server</artifactId>
+    <version>1.9</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/com.sun.jersey.contribs/jersey-spring -->
+<dependency>
+    <groupId>com.sun.jersey.contribs</groupId>
+    <artifactId>jersey-spring</artifactId>
+    <version>1.9</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-core</artifactId>
+    <version>4.3.5.RELEASE</version>
+</dependency>
+
+
+
+
+
+SpringJersey1App:-
+	|
+	|--com.ratan.spring.service
+	|			|--ServiceBean.java
+	|
+	|--com.ratan.spring.controller
+				|--MyController.java
+	|
+	|--WEB-INF
+		|--web.xml
+		|--applicationContext.xml
+
+
+
+ServiceBean.java:-
+----------------
+
+package com.ratan.spring.service;
+
+import org.springframework.stereotype.Service;
+
+@Service("bean")
+public class ServiceBean {
+	
+	
+	public String m1(){
+		System.out.println("Inside M1 of ServiceBean");
+		return "Hello Spring Jersey 1 ";
+	}
+}
+
+
+MyController.java:-
+-------------------
+
+package com.ratan.spring.controller;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.ratan.spring.service.ServiceBean;
+
+@Component
+@Path("myapp")
+public class MyController {
+
+	@Autowired
+	private ServiceBean bean;
+	
+	
+	@Path("getMsg")
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	public String getMsg(){
+	
+		//String msg=bean.m1();
+	
+		String msg="hello..."+bean;
+		
+		return msg;	
+	}	
+}
+
+
+web.xml:-
+---------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+ 
+ 
+
+
+    <!-- Jersey Servlet -->
+    <servlet>
+        <servlet-name>jersey-servlet</servlet-name>
+        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+        
+	<!-- Register resources and providers -->
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>com.ratan.spring.controller</param-value>
+        </init-param>
+        
+	<load-on-startup>1</load-on-startup>
+
+    </servlet>
+ 
+    <servlet-mapping>
+        <servlet-name>jersey-servlet</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- Spring Listener -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+ 
+    <!-- loading Spring Context for registering beans with ApplicationContext -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>WEB-INF/applicationContext.xml</param-value>
+    </context-param>
+ 
+ 
+</web-app>
+
+
+applicationContext.xml:-
+-----------------------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+ <context:component-scan base-package="com.ratan.spring.service,com.ratan.spring.controller" />
+</beans>
+
+
+
+
+
+Making Spring Bean as Restfull Service:-(with jersey implementation)(Jersey 2.x) with web.xml
+=============================================================================================
+
+
+--similar to the above example except following steps:-
+
+
+
+1.change the dependency as follows:-
+-----------------------------------
+
+
+<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.ext/jersey-spring3 -->
+<dependency>
+    <groupId>org.glassfish.jersey.ext</groupId>
+    <artifactId>jersey-spring3</artifactId>
+    <version>2.13</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-core -->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-core</artifactId>
+    <version>4.3.5.RELEASE</version>
+</dependency>
+
+
+
+Note:- here we have used jersey-spring3 dependency with spring 4 becoz  spring 3 is not compatible with java 8.
+
+if we use jersey-spring4 dependency then no need to add spring 4 related dependency..so either we can use only one dependency ie jersey-spring4 dependency with commons-logging dependency.
+
+ex:-
+
+
+
+<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.ext/jersey-spring4 -->
+<dependency>
+    <groupId>org.glassfish.jersey.ext</groupId>
+    <artifactId>jersey-spring4</artifactId>
+    <version>2.27</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
+<dependency>
+    <groupId>commons-logging</groupId>
+    <artifactId>commons-logging</artifactId>
+    <version>1.2</version>
+</dependency>
+
+
+
+
+
+ 
+
+
+
+
+2.change the web.xml as follows:-
+--------------------------------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+ 
+ 
+    <!-- Spring Listener -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+ 
+    <!-- Jersey Servlet -->
+    <servlet>
+        <servlet-name>jersey-servlet</servlet-name>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+        <!-- Register resources and providers -->
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>com.ratan.spring.controller</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+ 
+    <servlet-mapping>
+        <servlet-name>jersey-servlet</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+ 
+    <!-- loading Spring Context for registering beans with ApplicationContext -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>WEB-INF/applicationContext.xml</param-value>
+    </context-param>
+ 
+ 
+</web-app>
+
+
+
+
+remainig all files r same as above application.
+
+
+
+
+
+
+
+
+
+Making Spring Bean as Restfull Service:-(with jersey implementation)(Jersey 2.x) without web.xml
+================================================================================================
+with normal jersey 2.x (not spring flavoured jersey)
+
+
+
+
+create a dynamic web application and convert it as Maven project.
+
+
+add the following dependency in pom.xml file:- 1 for spring and remaining 3 for jersey 2.x
+
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>4.2.5.RELEASE</version>
+</dependency>
+
+  
+   <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>2.20</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>2.20</version>
+        </dependency>
+        
+<dependency>
+    <groupId>cglib</groupId>
+    <artifactId>cglib</artifactId>
+    <version>3.1</version>
+</dependency>
+                
+
+
+
+
+
+SpringRestApp1
+	|
+	|--com.ratan.spring.service
+				|--ServiceBean.java
+	|
+	|--com.ratan.spring.ws.controller
+				|--MyBean.java
+	|
+	|--com.ratan.spring.ws.cfg
+				|--MyWsCfg.java
+	|
+	|--resources
+		|--applicationContext.xml
+
+
+ServiceBean.java:-
+----------------
+
+package com.ratan.spring.service;
+
+public class ServiceBean {
+
+	public String m1(){
+		return "Hello From Spring Bean";
+	}
+	
+	
+}
+
+
+
+
+MyBean.java:-
+------------
+
+package com.ratan.spring.ws.controller;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+
+import javax.ws.rs.core.Response;
+
+import com.ratan.spring.service.ServiceBean;
+
+@Path("myapp")
+public class MyBean {
+
+	
+	private ServiceBean bean;
+
+	public ServiceBean getBean() {
+		return bean;
+	}
+
+	public void setBean(ServiceBean bean) {
+		this.bean = bean;
+	}
+	
+
+	@GET
+	@Path("getMsg")
+	public Response getService(){
+		String str=bean.m1();
+		
+		return Response.status(200).entity(str).build();
+	}	
+}
+
+
+applicationContext.xml:-
+------------------------
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+<bean id="mybean" class="com.ratan.spring.ws.controller.MyBean">
+
+<property name="bean" ref="service"/>
+</bean>
+
+<bean id="service" class="com.ratan.spring.service.ServiceBean"/>
+
+
+</beans>
+
+
+
+MyWsCfg.java:-
+-------------
+
+package com.ratan.spring.ws.cfg;
+
+import javax.ws.rs.ApplicationPath;
+
+import org.glassfish.jersey.server.ResourceConfig;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.ratan.spring.ws.controller.MyBean;
+
+@ApplicationPath("rest")
+public class MyWsCfg extends ResourceConfig{
+
+
+	public MyWsCfg() {
+		packages("com.ratan.spring.ws.controller");
+		
+		ApplicationContext ctx=new ClassPathXmlApplicationContext("resources/applicationContext.xml");
+		
+		MyBean bean=(MyBean)ctx.getBean("mybean");
+		
+		register(bean);
+	}
+		
+}
+
+
+
+
+
+
+

@@ -1,0 +1,1123 @@
+
+Q/-Explain about 'out' implicit object ?
+
+
+A/- 'out' is the reff of JspWriter obj..
+
+--it is a browser stream obj,i.e whatever is written into this stream that is sent to the client.
+
+
+
+Q/-Explain about the "page" implicit obj ?
+
+
+A/- it is a reff to page implementaion class obj i.e container genereted servlet instance.
+
+--this implicit obj is seldom used in jsp.
+
+
+
+
+****All jsp implicit objects r avlailable in only jsp-expresssion and jsp scriptlet. but not in jsp-declaration.
+
+
+
+
+****in translation phase,converting jsp into eqqivilant servlet, page compiler uses timestamp..
+
+--for the next time requst for a jsp,if the code of the jsp is not changed,the translation phase will not going to perform..only request processing phase will occur...
+
+
+
+
+pageContext obj:-
+===============
+
+--this obj represent the entire page environments.
+
+***it holds all implicit objects .ie other implicit obj reff encapculated into pageContext object.
+
+
+--this obj has getXXX() methods to retrieve other implicit objs:-
+
+ex:-
+
+JspWriter out=pageContext.getOut();
+
+HttpSession session=pageContext.getSession();
+
+
+ 
+--whenever a helper class need the entire page environment to assist the jsp,instead of supplying individually all the implicit obj,we can supply only pageContext obj.
+
+
+
+
+ 
+taglib directive:-
+=================
+
+--a collection of jsp tags is known as taglibrary.
+
+we have to kinds of jsp tags:-
+
+1.standard tags
+2.custom tags
+
+
+--in order to use standard tags in jsp,we need not import them,as they r implicitly available to every jsp.
+
+
+--custom tags r not available to the jsp implicitly.in order to use them we have to import them first.
+
+--'taglib' directive is used to import the custom tag libraries into the jsp.
+
+
+
+thses directives has 2 attributes:-
+
+1.prefix
+2.uri
+
+--prefix is used to specify an alias name to the tag library.this is a user defined name.
+
+--uri specify the registration name of the tag library.
+
+
+ex:-
+
+<%@ taglib="nit" uri="http://www.ratan.com" %>
+
+
+
+
+diff scopes in jsp:-
+==================
+
+
+--page scope
+--reuqest scope
+--session scope
+--application scope
+
+
+***if a data item is stored in "pageContext" obj it is said to be in page scope.
+
+
+
+
+
+Q/-explain about "errorPage" and "isErrorPage" attributes ?
+
+
+A/-
+
+--we have two kinds of jsp :-
+
+1.exception handlers
+2.processing pages
+
+
+--by default any jsp is a processing page but not the exception handler page.
+
+
+--by default "isErrorPage" attribute value is false therefore default jsp page is processing page not the exception handlers page.
+
+--to make any jsp page as error handler page assign the value as true.
+
+--in exception handlers page(jsps) the "exception" attribute is available.
+
+
+--"errorPage" is used to associate an exception handler page to the processing page.
+
+
+
+
+
+Q/-explain about "session" and "extends" attributes ?
+
+
+A/-"extends" attribute is used to specify the pagecompiler to generate the page implementation class so as not to inherit from its specific class instead from a user defined class.
+
+--to customise the functionality of the container this attribute is used..
+
+--this attribute used very seldom.
+
+
+***"session" attribute is used to specify that current jsp is participating session tracking or not.
+
+--if session value is false ..then session obj will not be availbale in the current jsp page.
+
+
+
+"info" :-
+======
+
+--this attribute is used to specify the general purpose information about the jsp.
+
+ex:-
+
+<%@page info="this page is developed by xyz on 12/05/15" %>
+
+
+--programitically we can get this value by calling getServeltInfo() on Servelt interface.
+
+
+"ELIgnored":-
+===========
+
+--by default its value is "false" ,so the expresion will be evaluated..
+
+if we make its value as "true" pagecompiler treats that syntax as templete text(html content) but not as EL syntax.
+
+${10+20}
+
+
+
+
+"isThreadSafe":-
+==============
+
+
+--by defualt its value is true,that indicats that container generated servlet does not inherit from "SingleThredModel" interface 
+
+
+
+Q/- what r the drawbacks if java code directly placed into the jsp ?
+
+
+A/-
+
+1.thight coupling of java-code and html code leads the simmilar problem caused by servlet.
+
+2.application and bussiness logic of the project(java code) is exposed to the bussiness client.
+
+3.code is not reusable accross the jsp.
+
+4.dealing with development time error is not flexible.
+
+
+
+
+Jsp action tag:-
+==============
+
+--request processing time or runtime instruction to the pagecompiler is known as jsp-action tag.
+
+
+
+--Jsp action tags r classified into two categories:-
+
+1.standard action tag
+2.custom action tag
+
+
+standard action tag:-
+===================
+--predefined tags whose meaning is already knwon to the jsp container r known as standard action tags.
+
+1.forward:- 
+
+--it is used to switch the control from current page to the other page.
+--it is used to implement inter-jsp comm.
+--intarnally forward mechanism of RequestDespatching is used while executing forward tag.
+
+ex:-
+
+<jsp:forward page="target.jsp"/>
+
+
+2.param:-
+
+--it is used to pass request parameter from one jsp to other while inter-jsp comm.
+
+ex:-
+
+<jsp:forward page="target.jsp" >
+<jsp:param name="t1" value="20" />
+</jsp:forward>
+
+
+
+***
+plugin
+fallback
+params
+
+these three standard action tag is used to embed Applet in the jsp.
+
+
+
+
+Q/- what r the diff logics of a webapplication ?
+
+A/-
+
+1.presentation logic(output generation code)
+2.bussiness logic(data processing code)
+3.application logic(flow control code)
+
+
+
+benifits of MVC pattern of WA development:- 
+=========================================
+
+
+1.clear seperation of concerns and thereby clear division of role.
+
+2.without affecting one concern,other concern can be modified.
+
+3.parallal development is possible.
+
+4.code optimization.
+
+5.tools can be used to generate code and thereby RAD is promoted.
+
+6.code become reusable and maintainabilty of the system is improved.
+
+
+
+Custom Tag:-
+============
+
+
+Q/- what r the similarites b/w standard action tag and custom tag ?
+
+
+A/-
+
+--both r the runtime instructions to the jsp pagecompiler.
+--both follows xml syntax.
+--both sends java code to the background of the jsp.
+--both should have prefix while using them.
+
+
+diff bt standard action tags and custom tags :-
+=============================================
+
+
+	Standard Tags				Custom tags
+
+1.predefined tags,shipped with web		1.user-defined tags,developer should develop this tag
+container.					before using it.
+
+2.meaning and functionality is already		2.developer should develop the tag,funtional code and  
+known to the container.				map them to expalin to the container about the tag.
+
+3.limited in functionality			3.extinsible
+
+4.they r not application specific.		4.application specific.
+
+
+5.implicitly avalilable to the jsp.		5.using "taglib" directive,custom tag must be imported
+							into the jsp.
+
+
+
+
+
+Tag handler:-
+===========
+
+--A java class that provides functionality for the custom tag is known as a tag handler.
+
+--it is a container managed user-defined public java class that implements 
+"javax.servlet.jsp.tagext.Tag" interface.
+
+
+	Tag(I)
+	 |
+      TagSupport(C)
+	|
+      MyTagHandler
+
+
+
+
+
+TLD(Tag Library Discriptor):-
+=============================
+
+--it is the text file with any name with .tld extention.
+
+--this is one per tag library.
+
+--pagecompiler uses this file to execute custom tags.
+
+--jsp developer develops this files and does the follwing:-
+
+1.custom tag creation
+2.configuring the tag properties
+3.specifying a logical name for the library
+4.specifying mapping info b/w custom tag and corresponding tag handler.
+
+
+
+Life cycle of a Tag hadler:-
+===========================
+
+
+--Tag interface provides life-cycle methods to tag-handler:-
+
+1.setPageContext(PageContext pc);
+
+2.int doStartTag()
+
+3.int doEndTag()
+
+4.release()
+
+
+
+---doStartTag() returns one of the two constant of Tag interface indicating container what to do next:-
+
+a.EVAL_BODY_INCLUDE
+b.SKIP_BODY
+
+
+---doEndTag() returns one of the two constant of Tag interface indicating container what to do next:-
+
+a.EVAL_PAGE
+b.SKIP_PAGE
+
+
+
+
+
+			container loads tag-handler class
+					|
+			container creates tag-handler instance
+					|
+			container calling setPageContext(-)
+					|
+					|
+				  doStartTag()
+	EVAL_BODY_INCLUDE		|          SKIP_BODY			
+		   -------------------------------------
+		   |					|
+		   |					|
+	container evalueats the				|
+	body of the tag					|
+		  |					|
+		  |					|
+		  |----------------------------------->doEndTag()
+							  |
+				EVAL_PAGE		  |		   SKIP_PAGE
+					-----------------------------------------			
+					|					|
+				container evaluats rest			   container does not process
+				of the jsp					rest of the jsp
+
+
+
+
+
+
+
+
+Q/-develop a custom tag and use it in a jsp to implement the use case of viewing online result:-
+
+
+A/-
+
+
+custom tag development steps:-
+
+1.develop a tag handler.
+2.create a tld file.
+
+
+--if tld file is placed into WEB-INF folder and tag-handler class into classes folder,custom tag available to the application but not to the jsp.
+
+
+--import the tag library by using taglib directive
+--use the custom tag by specifying the user-defined prefix.
+
+
+
+customtagapplication
+	|
+	|
+	|--index.html
+	|--result.jsp
+	|
+	|--WEB-INF
+		|
+		|--web.xml
+		|--mytaglib.tld
+		|
+		|--classes
+		|	|--ResultHandler.class
+		|
+		|--lib
+		|    |--connector.jar
+		|
+		|--src
+		     |--ResultHandler.java
+
+
+
+
+
+
+index.html:-
+==========
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body bgcolor="pink">
+<center>
+<h2>Exam Result</h2>
+
+<form action="result.jsp">
+
+Enter Roll number:<input type="text" name="roll"><br><br>
+<input type="submit" value="Get">
+
+</form>
+
+
+</center>
+
+</body>
+</html>
+
+
+
+
+
+ResultHandler.java:-
+==================
+
+
+
+package p1;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspWriter;
+import javax.servlet.jsp.PageContext;
+import javax.servlet.jsp.tagext.TagSupport;
+
+public class ResultHandler extends TagSupport {
+
+	Connection conn;
+	PreparedStatement ps;
+	PageContext ctx;
+
+	@Override
+	public void setPageContext(PageContext pageContext) {
+		ctx = pageContext;
+
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			String url = "jdbc:mysql://localhost:3306/db1";
+			conn = DriverManager.getConnection(url, "root", "root");
+
+			ps = conn.prepareStatement("select * from student where roll=?");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	@Override
+	public int doStartTag() throws JspException {
+
+		try {
+
+			ServletRequest req = ctx.getRequest();
+
+			String no = req.getParameter("roll");
+
+			int roll = Integer.parseInt(no.trim());
+
+			ps.setInt(1, roll);
+
+			ResultSet rs = ps.executeQuery();
+
+			JspWriter out = ctx.getOut();
+
+			if (rs.next()) {
+
+				out.print("<h2>Result is </h2>");
+				out.print("<h3>Roll Number :" + roll + " </h3><br><br>");
+				out.print("<h3>Name  :" + rs.getString(2) + " </h3><br><br>");
+				out.print("<h3>Marks  :" + rs.getInt(3) + " </h3>");
+
+			} else {
+				out.print("wrong roll numner");
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		return SKIP_BODY;
+
+	}
+
+	@Override
+	public void release() {
+
+		try {
+			ps.close();
+			conn.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+}
+
+
+
+
+
+
+mytaglib.tld:-
+============
+
+
+<taglib>
+<tlib-version>2.0</tlib-version>----mandatory
+<jsp-version>2.1</jsp-version>
+
+<uri>http://www.ratan.com</uri>
+
+<tag>
+<name>res</name>---name of the tag
+<tag-class>p1.ResultHandler</tag-class>
+<body-content>empty</body-content>----------//or JSP if body is there
+</tag>
+
+
+---//we can have any number of <tag>
+
+</taglib>
+
+
+
+
+result.jsp:-
+==========
+
+
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+
+<%@ taglib prefix="nit" uri="http://www.ratan.com" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+
+<nit:res/>
+
+</body>
+</html>
+
+
+
+
+Q/- how to deal with the attributes of the custom tag ?
+
+
+A/-
+
+--dealing with attributes of custom tag is a 3 step process:-
+
+
+step 1:-declare as many instance variable as there r attributes for the custom tag.
+
+
+step 2:-in tag handler class define those many setter and getter methods.
+
+--container picks up the attribute value from the jsp and calls the setter method to populate tag handler instance variables.
+
+step 3:-in the tld file make the following entries for the each attribute of the custom tag:-
+
+
+
+<attribute>
+
+<name>roll</name>
+<required>true</required>
+<rtexprvalue>true</rtexprvalue>
+</attribute>
+
+</tag>
+</taglib>
+
+
+
+
+<required>---is used to specify wheather the attribute is optional or mandatory.
+
+
+<rtexprvalue>---is used to specify how to supply value to the attribute of the custom tag "true" indicates that both statically and dynamically value can be supplied.and false indicate that only statically can be supplied.
+--dynamic mean runtime expression value...
+
+
+
+
+
+
+
+Custom tags NTRJ notes:-
+===================================================================
+
+
+
+--Jsp tag library is the library that contains set of jsp tags.
+
+--the java class that defines functionality of each jsp tag is called as jsp tag handler class.
+
+
+--the java class that extends from javax.servlet.jsp.tagext.TagSupport class is called as jsp tag handler class.
+
+
+--each jsp tag library contains one tld file(tag library descriptor)(a xml file).
+
+--this tld file contains various configuration details of jsp tags,like tag names,attribute names,taghandler class names and other details.
+
+
+
+procedure to develop and utilize custom/userdefined jsp tag library:-
+---------------------------------------------------------------------
+
+
+Step 1:- design the jsp tags of jsp tag library.
+
+RatanTag library
+	|
+	|
+	|--<ABC>
+	|--<XYZ>
+
+
+Step 2:- develop jsp tag handler classes for the above jsp tags.
+
+
+--in WEB-INF/classes folder:-
+
+
+public class ABCTag extends TagSupport
+{
+--
+--//define the functionality of <ABC> tag
+--
+}
+
+
+public class XYZTag extends TagSupport
+{
+--
+--//define the functionality of <XYZ> tag
+--8
+}
+
+
+Step 3:- prepare tld file having jsp tags configuration:-
+
+
+--in WEB-INF/ratan.tld file:-(blue print)
+
+<ABC>---ABCTag.class
+<XYZ>---XYZTag.class
+7
+
+
+Step 4:- configure jsp tag library in web.xml file of web-application
+
+
+--in web.xml file:-
+
+<web-app>
+
+	<taglib>             5
+		<taglib-uri>demo</tablib-uri>
+		<taglib-location>/WEB-INF/ratan.tld</taglib-location>
+	</taglib>                           6
+
+</web-app>
+
+
+note:- every jsp tag library that is configured in web.xml file will be identified with its taglib uri.
+
+
+step 5:- utilize the jsp tags of the jsp tag library in the jsp file of the webapplication.
+
+
+example.jsp:-
+------------
+
+		4	      3
+<%@taglib uri="demo" prefix="st" %>
+
+<st:ABC/>
+2
+<st:XYZ/>
+1
+
+
+
+
+
+Note:- in the above code sample 1 to 8 shows flow of execution to <st:ABC> and <st:XYZ> tag
+
+step 1 to step 3 shows development of custom tag and step 4 and step 5 shows utilization of the custom tag.
+
+
+
+
+Note:- every jsp tag must be utilize with prefix.
+
+when two jsp tags of two diff jsp tag libraries have got same name,then they can be diffrentiated based on prifixes while using them in a single jsp file.
+
+
+
+
+
+
+
+
+=======================================================================
+
+
+
+
+
+
+
+
+Q/-what r the major role of jsp in realtime java based webapplication ?
+
+A/-
+
+1.input page development.
+
+2.Response page development.
+
+
+
+Q/- what r the diff types of custom tags in jsp ?
+
+
+1.application specific tags.
+
+2.JSTL
+
+3.web-application framework provided tags.
+
+
+
+
+Q/- what r the diff ways of eliminating java code from the jsp.
+
+1.implementing MVC 
+
+2.using EL 
+
+3.standard action tags
+
+4.application specific custom tags.
+
+5.JSTL tags
+
+6.framework given tags.
+
+
+
+
+EL(Expression Language):-
+=======================
+
+
+
+--it simplyfies the accessibilty of data stored in the java bean comp and other objects like request,session,application.
+
+--there r many implicit objects,operators and reserved words r there in EL.
+
+--it is newly added features in JSP 2.0.
+
+
+
+syntex:-
+
+${expr}
+
+
+
+
+implicit objs in EL:-
+
+
+1.pageScope
+
+2.requstScope
+
+3.sessionScope
+
+4.applicationScope
+
+5.param--->request parameter
+
+6.paramValues----request parameter to an array(so ${paramValues.courses[0]})
+
+7.header
+
+8.headerValues
+
+9.cookie
+
+10.initParam
+
+11.pageContext
+
+
+
+
+ex:-
+
+
+index.jsp:-
+---------
+
+<form action="process.jsp">
+
+EnterName:<input type="text" name="nm"/>
+<input type="submit" value="get">
+</form>
+
+
+process.jsp:-
+-----------
+
+Welcome ${param.nm}
+
+
+
+
+
+reserve words in EL:-
+====================
+
+
+lt,le,gt,ge
+
+eq,ne,true,false
+
+and,or,not,instanceof
+
+div,mod,empty,null
+
+
+
+operators and their precedence:-
+===============================
+
+[]
+
+()
+
+-(unary) ! empty
+
+* /div %mod
+
++ -(binary)
+
+< <= > >= lt le gt ge
+
+== != eq ne
+
+&& and
+
+|| or
+
+?:
+
+
+
+JSTL:-(jsp standard tag library)
+=====
+
+
+--JSTL is a collection of 5 tag libraries which simplyfies the jsp development:-
+
+1.core library---uri is :-http://java.sun.com/jsp/jstl/core and prefix is c.
+2.sql library---uri is :-http://java.sun.com/jsp/jstl/sql and prefix is sql.
+3.xml library---uri is :-http://java.sun.com/jsp/jstl/xml and prefix is x.
+4.formatting library---uri is :-http://java.sun.com/jsp/jstl/fmt and prefix is fmt.
+5.function library---uri is :-http://java.sun.com/jsp/jstl/functions and prefix is fn.
+
+
+Note:-for creating JSTL appl we need to set jstl.jar file
+
+
+jstl1.2.jar file
+
+
+
+
+
+Q/- how to make use of JSTL tags in JSP ?
+
+
+A/-three steps r involved in using any one of the JSTL tag library tag:-
+
+1.place the jstl related jar file in the classpath or lib folder.
+
+2.import the tag library using taglib directive.
+
+3.make use of EL to give the values to the attribute of the tags.
+
+
+
+core tags:-
+
+--is a collection of some general purpose jsp tags.these tags r used to create and remove scoped variables,take decisions,iterate over data items etc..
+
+
+
+
+ex:-
+
+1.
+
+<c:set var="nm1" value="${param.num1 }"/>
+<c:set var="nm2" value="${param.num2 }"/>
+
+
+<h1>
+The Value is <c:out value="${nm1+nm2}"/>
+</h1>
+
+		
+
+2.
+<c:set var="nm1" value="${param.num1 }"/>
+
+<c:if test="${nm1 >10  }">
+
+<h2>Pls Enter number1 less than 10</h2>
+
+</c:if>
+
+
+3.
+
+
+<c:set var="x" value="${param.t1 }"/>
+
+<c:choose>---//switch
+
+<c:when test="${x gt 100 }">---//case
+<h2>It is Big number</h2>
+</c:when>
+
+<c:when test="${x == 100 }">
+<h2>It is 100</h2>
+</c:when>
+
+<c:otherwise>------//default
+<h2>It is small number.</h2>
+
+</c:otherwise>
+
+
+</c:choose>
+
+
+
+4.
+
+
+
+<c:forEach var="f" begin="20" end="200" step="12">
+
+<c:out value="${f }"/>
+
+</c:forEach>
+
+
+
+
+Display the collection of Account of the client:-
+================================================
+
+
+<%
+
+Account a1=new Account();
+a1.setAccno(1001);
+a1.setName("Rama");
+a1.setBalance(5000);
+
+
+Account a2=new Account();
+a2.setAccno(1002);
+a2.setName("Hari");
+a2.setBalance(5500);
+
+
+ArrayList al=new ArrayList();
+
+al.add(a1);
+al.add(a2);
+
+request.setAttribute("accounts", al);
+%>
+
+
+<c:forEach items="${requestScope.accounts }" var="acc">
+
+<h2>Account number</h2>
+<c:out value="${acc.accno }"></c:out>
+
+<h2>Customer Name</h2>
+<c:out value="${acc.name }"></c:out>
+
+<h2>Customer Balance</h2>
+<c:out value="${acc.balance }"></c:out>
+
+
+</c:forEach>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

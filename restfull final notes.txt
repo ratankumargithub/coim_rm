@@ -1,0 +1,5067 @@
+--reffer servletasEnpointandApp folder for one service application and another is client webapplication with servlet endpoint..
+
+
+
+Restfull webservices(Representational State transfer):-
+====================================================
+
+
+--ws r categorized into two types:- 
+
+
+1.soap ws.
+
+2.Restful ws.
+
+
+--creating a ws using soap r heavy weight webservices,becoz apart from creating the ws class, there is need to create binding classes and also some xml files.
+
+
+--in order to make ws as light weight, another architectural style is defined and it is named as REST.
+
+--REST architectural style tells that create a ws with the required operations and allow them to access by the clients directly with the http protocol,without any binding classes and xml files.
+
+
+
+--this new architectural style for creating ws is defined by the author of HTTP protocol mr. Roy Fielding.
+
+--Based on REST architectural style proposed by mr.Roy fielding,Sun microsystem released JAX-RS api for creating Restful webservices in java.
+
+
+--it is one of the Service Api of j2ee platform
+
+--A restful ws makes a use of HTTP protocol only to allow a client App to access methods of ws.
+
+
+***-In a Restful ws,a ws class is called "rootresource" class and each method of the class is called a "resource".
+
+
+
+
+
+Diff bt SOAP and RESTful webservices:-
+=====================================
+
+
+	SOAP					REST
+
+
+1.it is heavy weight ws.			1.it is a lightweight ws.
+
+2.for creating SOAP webservices 		2.for creating RESTful ws there is no any specifcation.
+there is a specification.	
+
+
+3.to call an operation of a soap ws,		3.RESTful ws appl can be called by creating a client
+a client appl must be created.			 appl,or we can also directly access through browser.
+
+
+4.A SOAP ws can transfer the data to a client,	4.A RESTful ws can transfer data and also its		
+but it can not transfer representation of that 	  representation to a client.
+data(how the data will be presented).data
+cab be represented only in xml format.
+
+
+5.converting an existing class as soap ws is     5.converting an existing class as a RESTful ws is very
+not easy,becoz,binding classes and xml files r 	   easy,just we need to add RESTful annotations to
+also required at the other side.				the class.
+
+
+
+
+
+
+Rules to make a java class as RESTful ws:-
+==========================================
+
+
+1.every RESTful ws class must contains a relative path(uri),to make it as accessible to the client using HTTP protocol.
+
+2.each resource(method) of a ws should contains a reachable uri(addressable uri).
+
+3.when creating a RESTful ws class,we need to assume methods of HTTP protocol as interface methods and we need to define methods in a RESTful ws class like the following:-
+
+a.GET:-if we r creating a method that return some information from server side to client then we need to make that method as accessable to client using GET method of HTTP protocol.
+(this is read operation to client).
+
+
+b.POST:- if we r creating a method for storing/inserting data given by a client at server side,then make that method as accessible using POST method of HTTP protocol 
+(this is a create opearation to client).
+
+
+c.PUT:- if we want to create a method to update a data at server side by a new data given by the client,then make that method as accesible using PUT method of HTTP protocol.
+(this is a update operation to client.)
+
+
+d.DELETE:- if a method is created to delete some information from server side,then make that method as accesible using DELETE method of HTTP protocol.
+(this is delete operation to client).
+
+
+
+4. Every RESTful(RS) ws class must be public and it must contains a defualt constructor.
+
+
+5.A ws class must be within a package.
+
+6.A resource(method) of ws class should use one of the following types as its MIME type.
+
+a.text/html b.text/xml c.application/json d.text/plain.
+
+
+
+Note:- for creating a RS ws and also for creating client application,sun-microsystem has releaed JAX-RS api.(JavaApiforXml Restfull service)
+
+--JAX-RS api mainly contains in 3 packages:-
+
+1.javax.ws.rs
+2.javax.ws.rs.core
+3.javax.ws.rs.client------//it is not available in JAX-RS 1.x,but available in JAX-RS 2.x.
+
+
+--the implementaion of JAX-RS api is provided by vendors.some implementaions are:-
+
+1.Jersey--from sun microsystem
+
+2.RESTEASY--from JBOSS
+
+3.Restlet,etc
+
+
+
+
+List of Annotaions for creating a RS WS:-
+=========================================
+
+
+--this annotaion is used for adding or attaching a uri for root resource class(webservice class) and also for resource(methods).
+
+
+Note:- In RS ws,a request comes from client appl through HTTP protocol,in order to recieve a req i.e coming with HTTP protocol,we need to configure a servlet given by the vendor in web.xml file.
+
+
+
+1.@Path
+
+2.@GET
+
+3.@POST
+
+4.@PUT
+
+5.@DELETE
+
+6.@Produces
+
+7.@Consumes
+
+8.@PathParam
+
+9.@QueryParam
+
+10.@FormParam
+
+11.@MatrixParam
+
+
+
+@Path:-
+=======
+
+
+--this annotation is to assign a relative path to the ws class or a relative path to the methods of a ws class.
+
+
+--A ws class in RS service is called a "root resource class" and a method in a ws class is called as a "resource".
+
+--this annotation @Path has one element called "value".in an annotation,if the element name is value,then there is no need to specify that element name:-
+
+
+ex:-
+
+
+@Path(value="/sample")----->here (/) is optional
+public class SampleService
+{
+@GET
+@Path("hello")
+public String sayHello()
+{
+return "Hello";
+}
+
+
+@POST
+@Path("welcome")
+public String sayWelcome()
+{
+return "welcome";
+
+}
+}
+
+
+
+--through Http protocol we can call the above resources like the following:-
+
+http://localhost:8080/App1/ser/sample/hello
+
+or
+
+http://localhost:8080/App1/ser/sample/welcome
+
+
+where :-
+
+App1--webappl name
+
+ser---url pattern in web.xml or using @ApplicationPath annotation(without xml)
+
+sample/hello------relative path to call sayHello.
+
+
+
+
+
+
+@PathParam:-
+===========
+
+--it is used for receiving the data as input in resource(method) as part of the path of the url itself. 
+
+--this annotation is given for injecting  a path parameter value(value comming with request uri path)  to the parameter of a method(resource).
+
+--if we want to include any path parameter then we need to put parameter name in {} curly brace.
+
+
+--@PathParam is a parameter level annotation,it means it is applicable only for the parameter of methods.
+
+
+
+ex:1- 
+
+@Path("sample")
+public class SampleService
+{
+
+@GET
+@Path("hello/{uname}")
+public String sayHello(@PathParam("uname") String s)
+{
+
+return "Hello "+s;
+}
+
+}
+
+
+http://localhost:8080/App1/Ser/sample/hello/Rama
+
+
+here Rama ---value of a path variable uname and it will be injected in String s.
+
+
+
+ex:2- 
+
+
+
+@GET
+@Path("full/{fname}-{lname}")
+public String fullName(@PathParam("fname") String fname,@PathParam("lname") String lname)
+{
+return fname.concat(lname);
+}
+
+
+http://localhost:8080/App1/Ser/sample/full/Rama-Kumar
+
+
+here:-
+
+Rama---value of fname
+
+Kumar---value of lname
+
+
+
+
+
+
+
+
+@QueryParam:-
+=============
+
+--this annotation is used to inject query parameter value(comming with Url by adding ? mark ) to the method parameter.i.e receiving the data as input through query string.
+
+
+ex1:-
+
+
+@Path("/sample")
+public class SampleService
+{
+@GET
+@Path("name")
+public String fullName(@QueryParam("fname")String fname,@QueryParam("lname")String lname)
+{
+return fname.concat(lname);
+
+}
+}
+
+
+http://localhost:8080/App1/Ser/sample/name?fname=Rama&lname="Kumar"
+
+
+
+ex2:- 
+
+
+
+@Path("/sample")
+public class SampleService
+{
+
+@GET
+@Path("a/{k1}")
+public String m1(@PathParam("k1") String s1)
+{
+--
+--
+}
+
+
+
+@GET
+@Path("a")
+public String m2(@QueryParam("k2") String s2)
+{
+--
+--
+}
+}
+
+
+
+
+/sample/a/Rama------->m1
+
+/sample/a?k2=Rama-----m2
+
+
+
+
+
+
+@MatrixParam:- 
+-------------
+
+--it is arbitrary set of name-value pairs embedded in the uri path segment.
+
+--it starts with semicolon(;) and if multiple parameters r there then seperated with semicolon.
+
+
+ex:-
+
+@Path("/sample")
+public class SampleService
+{
+
+@GET
+@Path("a")
+public String m1(@MatrixParam("pid") int id,@MatrixParam("pname") String name)
+{
+--
+--
+}
+
+
+
+
+
+/sample/a;pid=101;pname=keyboard------->m1
+
+/sample/a;pname=keyboard;pid=101-----m1
+
+
+
+
+
+
+
+
+@FormParam:-
+===========
+
+
+--this annotation is used for injecting the value of a parameter submitted from HTML or JSP form to a method parameter.
+
+
+Note:- *****in order to use this @FormParam annotation that form must be submitted to the POST method of HTTP protocol.and method should have @Post annotation
+
+
+ex:-
+
+
+<form action="Ser/sample/a" method="Post">
+
+Name:<input type="text" name="t1">
+
+Age:<input type="text" name="t2">
+
+<input type="submit" value="submit">
+
+
+</form>
+
+
+
+
+@Path("sample")
+public class SampleService
+{
+@POST
+@Path("a")
+public String getData(@FormParam("t1") String name,@FormParam("t2") int age)
+{
+--
+--
+}
+
+}
+
+
+
+
+
+
+
+
+@Prodeuces:-
+===========
+
+--this annotation is used to add representation for the data returned by a ws method.(which MIME type response should be converted.)
+
+
+--the supported representation for the data r:-
+
+text/html
+
+text/plain
+
+application/pdf
+
+application/json
+
+
+
+Note:-****if a ws method is going to return an obj of a java class or a collection obj then representations for that response should be either application/xml or application/json
+
+
+ex1:- 
+
+
+@Path("hello")
+@GET
+@Produces("text/html")
+public String sayHello()
+{
+
+return "<h1>Hello</h1>";
+
+}
+
+
+
+ex2:-
+
+
+@Path("a/{id}")
+@GET
+@Produces("application/xml")
+public Contact getInfo(@PathParam("id") int id)
+{
+--
+--
+}
+
+
+
+
+ex3:- 
+
+
+@Path("read/{id}")
+@Produces("application/json")
+public Student readStudent(@PathParam String id){
+
+--
+return new Student(---);
+}
+
+
+
+@Consumes:-
+==========
+
+
+--this annotation is to tell a RS container that what type of input data representation should come from the client side to call a method of a RS service.
+
+
+--if a ws method is accepting a java class obj as input or a collection obj as input then we use @Consumes annotaions.
+
+
+--when a client is calling a method then that client appl must send input to the method in its acceptable format.(for testing purpose we can use Postman or Soap UI tools to send the data to the ws method.)
+
+--when calling the ws method from the client appl,in order to convert a java class obj or a collection
+obj into xml or json representaion,we have already a predefined API given in JAX-RS.like jackson api,Gson api,simple-json api,etc for converting json to java obj and jaxb api to convert xml to java obj.
+
+
+
+
+ex:-
+
+
+@Path("a")
+@POST
+@Consumes("application/xml")
+@Produces(text/plain)
+public String putContact(Contact c)
+{
+--
+--
+}
+
+
+
+
+
+Working with Jersey implementation:-
+====================================
+
+--Jersey is an opensource reference implementation given for JAX-RS api's by sun.
+
+
+--Jersey 1.x is a reference implementation for JAX-RS 1.0 api.
+
+--Jersey 2.x is a reference implementation for JAX-RS 2.0 api.
+
+
+--Jersey 1.x provided inbuilt Servlet is "com.sun.jersey.spi.container.servlet.ServletContainer".
+
+--Jersey 2.x provided inbuilt Servlet is "org.glassfish.jersey.servlet.ServletContainer".
+
+
+we can download the libraries of both version from:-
+
+www.jersey.java.net/download.html
+
+
+Using JERSEY implementation:-
+
+architecture:-reffer:- jersey.png
+
+
+
+
+
+
+EX for creating a RESTful ws using Jersey 1.x:-
+----------------------------------------------
+
+
+
+download the file:-jersey-archive-1.19.1.zip
+
+and unzip it.
+
+
+
+App1
+  |
+  |--WEB-INF
+	|--web.xml
+	
+	|--classes
+		|--com.ratan.SampleService.class
+	|--src
+	     |--com.ratan.SampleService.java
+	
+	|--lib
+	     |--*.jar(all the jar files from jersey-archive-1.19.1\lib folder)
+
+
+
+
+
+
+
+SampleService.java:-
+--------------------
+
+
+package com.ratan;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+@Path("sample")
+public class SampleService {
+
+	@GET
+	@Path("hello/{uname}")
+	@Produces("text/html")
+	public String sayHello(@PathParam("uname")String uname){
+		
+		return "<body bgcolor='pink'><h1>Hello "+uname+"</h1></body>";
+		
+	}
+	
+	@GET
+	@Path("bye")
+	@Produces("text/plain")
+	public String sayBye(){
+		
+		return "<h1>Bye.....</h1>";
+		
+	}
+	
+	
+	
+	
+	
+	
+}
+
+
+
+
+
+Note:- to compile the RS ws class we need to set the jsr311-api-1.1.jar to the classpath.(this file from jersey-archive-1.19.1\lib folder.)
+
+or
+
+
+create a normal dynamic webapplication in eclipse and convert that application in maven project then add the following dependency in pom.xml file.
+
+
+
+add the following maven dependeny:-
+
+<!-- https://mvnrepository.com/artifact/com.sun.jersey/jersey-bundle -->
+<dependency>
+    <groupId>com.sun.jersey</groupId>
+    <artifactId>jersey-bundle</artifactId>
+    <version>1.19</version>
+</dependency>
+
+
+
+
+
+web.xml:-
+--------
+
+<web-app>
+
+<servlet>
+
+<servlet-name>one</servlet-name>
+<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+
+<init-param>
+<param-name>com.sun.jersey.config.property.packages</param-name>
+<param-value>com.ratan</param-value>
+</init-param>
+
+<load-on-startup>1</load-on-startup>
+
+</servlet>
+
+
+<servlet-mapping>
+
+<servlet-name>one</servlet-name>
+<url-pattern>/rest/*</url-pattern>
+
+
+
+</servlet-mapping>
+
+
+</web-app>
+
+
+
+ 
+
+--Generate the war file for the above application as first.war and deploy it in tomcat server.
+
+--or directly run the application on server configured in eclipse.
+
+
+and from the browser give the request as:-
+
+
+http://localhost:8082/jaxrsproject/rest/sample/hello/rama for sayHello() operation of the ws.
+
+
+http://localhost:8082/jaxrsproject/rest/sample/bye for sayBye() operation of the ws.
+
+
+
+
+
+Note:- if we don't give path for a method then it will become default method..and we can access it directly by giving path of the class:-
+
+ex:-
+
+
+SampleService.java:-
+-------------------
+
+
+package com.rest.ws;
+import javax.ws.rs.*;
+
+@Path("/sample")
+public class SampleService
+{
+
+@GET
+@Produces("text/html")
+@Path("/{uname}")
+public String sayHello(@PathParam("uname") String s)
+{
+
+return "<h1>Hello "+s+"</h1>";
+
+}
+
+
+@GET
+@Produces("text/plain")
+**public String sayBye()
+{
+
+return "Bye";
+
+}
+
+}
+
+
+
+
+here to call sayBye():-
+
+
+http://localhost:8080/first/rest/sample
+
+
+
+Note:- in a ws class atmost only one method can be there without its path..(i.e default method),if we put two method without the path,at deploy time it generate the error.(we can change the mime type of @produce or change the Http method(GET,POST..)...priority is given to "text/plain" then "text/html"...in case of @Produce)
+
+
+
+
+
+Normal client for above service by using java networking api:-
+==============================================================
+
+
+package p1;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class Test {
+
+	public static void main(String[] args)throws Exception {
+		
+
+		getDetails();
+		
+	}
+
+	public static void getDetails()throws Exception{
+		
+		
+		URL u=new URL("http://localhost:8082/jaxrsproject/rest/sample/hello/rama");
+		
+		
+		HttpURLConnection con=(HttpURLConnection)u.openConnection();
+		
+		//setting the http method of request
+		con.setRequestMethod("GET");
+
+		//setting the @Produce Mime type
+		con.setRequestProperty("Accept", "text/html");
+		
+		BufferedReader br=new BufferedReader(new InputStreamReader(con.getInputStream()));
+		
+		
+		String result=br.readLine();
+		
+		System.out.println(result);		
+		
+	}
+	
+	
+}
+
+
+
+
+Jersey 1.x client for above service by using jersey1.x api:-
+========================================================
+
+
+
+package com.ratan.ws.client;
+
+import javax.ws.rs.core.MediaType;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
+
+public class RSClinet {
+
+	public static void main(String[] args) {
+		
+		//create a client obj
+		Client client=Client.create();
+		
+		String url="http://localhost:8088/rsApp1/rest/sample/rama";
+		
+		//create WebResource obj with request url
+		WebResource wr=client.resource(url);
+		
+		//get the Builder obj for WebResource
+		Builder builder=wr.accept("text/html");
+		
+
+		//get the ClientResponse obj from Builder obj.
+		ClientResponse res=builder.get(ClientResponse.class);
+		
+		String resString=res.getEntity(String.class);
+		
+		System.out.println(res.getStatus()+"========="+res.getStatusInfo());
+		System.out.println(resString);
+		
+		
+	}
+}
+
+
+
+
+
+
+
+
+Another way to create the service:-
+------------------------------------
+
+
+
+HelloService.java:-
+-------------------
+
+
+package com.ratan.rs;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+
+@Path("/getMessage")
+public class HelloService
+{
+
+@GET
+@Path("/{name}")
+public Response getMessage(@PathParam("name") String n)
+{
+String result="Welcome::"+n+" :: to jAX-RS ws";
+
+return Response.status(200).entity(result).build();
+
+}
+
+}
+
+
+
+to call the service:-
+---------------------
+
+http://localhost:8088/app2/getMessage/Rama
+
+
+
+
+
+Response class:-
+===============
+
+--this is an abstract class is present in javax.ws.rs.core package.
+
+--Defines the contract between a returned instance and the runtime when an application needs to provide metadata to the runtime. 
+
+--An application class can extend this class directly or can use one of the static methods to create an instance of this class using ResponseBuilder class.
+
+--ResponseBuilder is a nested class of Response class.
+
+ex1:- returning resposne of a ws method as String(text/plain)
+
+
+Response.ResponseBuilder rb=Response.status(200);
+
+rb.entity("Welcome to Rest api");returned obj as parameter.
+
+Response rs=rb.build();
+
+
+ex2:- returning response of a ws method as User-defined obj in either json or xml format.
+
+@GET
+@Path("getStudent/{roll}")
+@Produces("application/xml")
+public Response getStudentDetails(@PathParam("roll") int id)
+{
+
+
+Student st=new Student(id,"rama",500);
+
+return Response.status(200).entity(st).build();
+
+}
+
+
+
+
+
+
+
+exApp:-consume data in xml and producing String using jersey 1.x:-
+==================================================================
+
+
+
+jerseyAppXMLtoString
+	|
+	|--com.ratan.ws.p1
+	|		|--Product.java
+			|--ProductService.java
+	|
+	|--com.ratan.ws.client
+			|--RSClient.java
+	|
+	|--pom.xml
+
+
+
+pom.xml:-
+--------
+
+
+<!-- https://mvnrepository.com/artifact/com.sun.jersey/jersey-bundle -->
+<dependency>
+    <groupId>com.sun.jersey</groupId>
+    <artifactId>jersey-bundle</artifactId>
+    <version>1.19</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
+<dependency>
+    <groupId>javax.xml.bind</groupId>
+    <artifactId>jaxb-api</artifactId>
+    <version>2.1</version>
+</dependency>
+
+
+
+Product.java:-
+-------------
+
+package com.ratan.ws.p1;
+
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="product")//root tag to xml
+@XmlType(propOrder={"roll","name","marks"})// for properly ordered...
+public class Product implements Serializable{
+
+	private int pid;
+	private String name;
+	private int price;
+	
+	@XmlAttribute(name="pid")//attribute of the <product> tag.
+	public int getPid() {
+		return pid;
+	}
+	public void setPid(int pid) {
+		this.pid = pid;
+	}
+	
+	@XmlElement
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	@XmlElement
+	public int getPrice() {
+		return price;
+	}
+	public void setPrice(int price) {
+		this.price = price;
+	}
+	
+}
+
+
+ProductService.java:-
+--------------------
+
+package com.ratan.ws.p1;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+@Path("products")
+public class ProductService {
+
+	@POST
+	@Path("registerProduct")
+	@Produces("text/plain")
+	@Consumes("application/xml")
+	public String registerProduct(String productXml){
+		
+		return "registered sucessfully "+productXml;
+		
+	}	
+}
+
+
+
+RSClient.java:-
+--------------
+
+package com.ratan.ws.client;
+
+import java.io.StringWriter;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
+import com.ratan.ws.p1.Product;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
+
+public class RSClinet {
+
+	public static void main(String[] args) throws JAXBException {
+		
+		
+		Client client=Client.create();
+		
+		String url="http://localhost:8088/rsApp1/rest/products/registerProduct";
+		
+		WebResource wr=client.resource(url);
+		
+		//set the consume type
+		Builder builder=wr.type(MediaType.APPLICATION_XML);
+		
+		//set the produce type
+		builder.accept(MediaType.TEXT_PLAIN);
+		
+		
+		Product p=new Product();
+		
+		p.setPid(100);
+		p.setName("Mouse");
+		p.setPrice(500);
+		
+		
+		JAXBContext jc=JAXBContext.newInstance(Product.class);
+		
+		Marshaller mar=jc.createMarshaller();
+		
+		//destination where we marshal the obj as String
+		StringWriter sw=new StringWriter();
+		
+		//marshal the obj as xml
+		mar.marshal(p, sw);
+	
+		//get the appropriate xml as string;
+		String productXml=sw.toString();
+		
+		
+		System.out.println(productXml);
+		ClientResponse res=builder.post(ClientResponse.class,productXml);
+		
+		
+		String resString=res.getEntity(String.class);
+		
+		System.out.println(res.getStatus()+"========="+res.getStatusInfo());
+		System.out.println(resString);
+		
+	}
+}
+
+
+
+
+exApp:-  consume data in xml and producing json using jersey 1.x:-
+===================================================================
+
+
+simmillar to above app except:- RSClient.java and ProductService.java
+
+
+Note:- even to produce data in the form of JSON,to the bean class XML related annotations must be there 
+
+ex:-
+
+@XmlRootElement to the class level
+
+@XmlElement :- to every setter method..
+
+
+--these anno comes along with jdk 
+
+
+
+
+
+ProductService.java:-
+--------------------
+
+
+package com.ratan.ws.p1;
+
+import java.io.StringReader;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+
+@Path("products")
+public class ProductService {
+
+	@POST
+	@Path("registerProduct")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes("application/xml")
+	public Product registerProduct(String productXml){
+		
+		System.out.println("registered Sucessfully "+productXml);
+		Product p=null;
+		
+		try{
+		JAXBContext jc=JAXBContext.newInstance(Product.class);
+		
+		Unmarshaller um=jc.createUnmarshaller();
+		
+		StreamSource sc=new StreamSource(new StringReader(productXml));
+		
+		 p=um.unmarshal(sc,Product.class).getValue();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	
+		return p;
+		
+	}
+	
+}
+
+
+
+
+RSClient.java:- just change the MiME type
+--------------
+
+package com.ratan.ws.client;
+
+import java.io.StringWriter;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
+import com.ratan.ws.p1.Product;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResource.Builder;
+
+public class RSClinet {
+
+	public static void main(String[] args) throws JAXBException {
+		
+		
+		Client client=Client.create();
+		
+		String url="http://localhost:8088/rsApp1/rest/products/registerProduct";
+		
+		WebResource wr=client.resource(url);
+		
+		//set the consume type
+		Builder builder=wr.type(MediaType.APPLICATION_XML);
+		
+		//set the produce type
+		builder.accept(MediaType.APPLICATION_JSON);
+		
+		
+		Product p=new Product();
+		
+		p.setPid(100);
+		p.setName("Mouse");
+		p.setPrice(500);
+		
+		
+		JAXBContext jc=JAXBContext.newInstance(Product.class);
+		
+		Marshaller mar=jc.createMarshaller();
+		
+		//destination where we marshal the obj as String
+		StringWriter sw=new StringWriter();
+		
+		//marshal the obj as xml
+		mar.marshal(p, sw);
+	
+		//get the appropriate xml as string;
+		String productXml=sw.toString();
+		
+		
+		System.out.println(productXml);
+		ClientResponse res=builder.post(ClientResponse.class,productXml);
+		
+		
+		String resString=res.getEntity(String.class);
+		
+		System.out.println(res.getStatus()+"========="+res.getStatusInfo());
+		System.out.println(resString);
+		
+		
+	}
+}
+
+
+
+
+producing json data and consuming xml data (client appl using java networking api.):-
+====================================================================================
+
+
+
+Student.java:-
+-------------
+
+package com.ratan.ws.myws;
+
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="student")
+@XmlType(propOrder={"roll","name","marks"})//for properly ordered
+public class Student implements Serializable {
+
+	private int roll;
+	private String name;
+	private int marks;
+	
+	public Student() {
+		// TODO Auto-generated constructor stub
+	}
+	@XmlAttribute(name="roll")
+	public int getRoll() {
+		return roll;
+	}
+
+	public void setRoll(int roll) {
+		this.roll = roll;
+	}
+
+	@XmlElement
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@XmlElement
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
+	public Student(int roll, String name, int marks) {
+		super();
+		this.roll = roll;
+		this.name = name;
+		this.marks = marks;
+	}	
+	
+}
+
+
+TestWs1.java:-
+-------------
+
+package com.ratan.ws.myws;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+
+@Path("myapp")
+public class TestWs1 {
+
+	@POST
+	@Consumes(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("hello")
+	public Student sayHello2(String xmlString){
+		
+		System.out.println(xmlString);
+		
+		//dummy Student obj.
+		//we can unmarshall the xmlString to create the Student obj using JaxBContext.
+
+		Student st=new Student(100, "Rama", 500);
+		
+		return st;//this obj will be automatically converted to json obj.
+		
+		
+	}	
+}
+
+
+
+
+
+
+
+WsClient.java:-
+--------------
+
+package com.ratan.ws.myws;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
+public class WsClient {
+	
+public static void main(String[] args)throws Exception {
+		
+
+		getDetails();
+		
+	}
+
+	public static void getDetails()throws Exception{
+		
+		
+		URL u=new URL("http://localhost:8088/testWsproject1/rest/myapp/hello");
+		
+		HttpURLConnection con=(HttpURLConnection)u.openConnection();
+		
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Accept", "application/json");// setting @Produce format
+		con.setRequestProperty("Content-Type", "application/xml");//setting @Consume format
+		
+		 con.setDoOutput(true); //this is to enable writing
+		 con.setDoInput(true);  //this is to enable reading
+		 
+		
+		 Student st=new Student(100, "Rama", 5000);
+			
+		 	//converting Student obj to xml type
+			JAXBContext jc=JAXBContext.newInstance(Student.class);
+			
+			Marshaller mr=jc.createMarshaller();
+			StringWriter sw=new StringWriter();
+			
+			mr.marshal(st,sw);
+			
+			String studentXml=sw.toString();
+			
+			//passing @Consume data to the ws method
+			ObjectOutputStream ous=new ObjectOutputStream(con.getOutputStream());
+			
+			ous.writeObject(studentXml);
+			ous.flush();
+			ous.close();
+			
+			//reading the @Produce data from the ws method
+		BufferedReader br=new BufferedReader(new InputStreamReader(con.getInputStream()));
+		
+		String result=br.readLine();
+		
+		System.out.println(result);		
+				
+	}
+	
+	
+}
+
+
+
+
+
+WS method with user defined Object(POJO) as paramter consumed by xml and returned by json:-
+============================================================================================
+
+--using java networking api:-
+
+
+
+
+
+
+--here in client application,we need to use ObjectStream to pass the xml data to the ws method.
+
+
+ex:-
+
+
+TestWs1.java:-
+--------------
+
+package com.ratan.ws.myws;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+
+@Path("myapp")
+public class TestWs1 {
+
+	@POST
+	@Consumes(MediaType.APPLICATION_XML)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("hello")
+	public Student sayHello2(Student x){
+		
+		System.out.println(x.getName());//Rama
+		
+		//return x;  
+		//or 
+		
+		//this is a dummy obj.
+		Student st=new Student(100, "Arjun", 500);
+		
+		return st;// it will be automatically converted to JSON 	
+	}		
+}
+
+
+Note:- if @Produce type is xml type then returned obj will automatically converted to xml format.
+
+--here if @Consumed type is String(in xml or json format)  and @Produce type is json or xml then we need jaxb or json api to convert appropriate String to the java obj format in ws method.
+
+
+
+
+WsClient.java:-
+--------------
+
+package com.ratan.ws.myws;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
+public class WsClient {
+	
+public static void main(String[] args)throws Exception {
+		
+
+		getDetails();
+		
+	}
+
+	public static void getDetails()throws Exception{
+		
+		
+		URL u=new URL("http://localhost:8088/testWsproject1/rest/myapp/hello");
+		
+		HttpURLConnection con=(HttpURLConnection)u.openConnection();
+		
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Accept", "application/json");// setting @Produce format
+		con.setRequestProperty("Content-Type", "application/xml");//setting @Consume format
+		
+		 con.setDoOutput(true); //this is to enable writing
+		 con.setDoInput(true);  //this is to enable reading
+		 
+		
+		 Student st=new Student(100, "Rama", 5000);
+			
+		 	//converting Student obj to xml type
+			JAXBContext jc=JAXBContext.newInstance(Student.class);
+			
+			Marshaller mr=jc.createMarshaller();
+			StringWriter sw=new StringWriter();
+			
+			mr.marshal(st,sw);
+			
+			String studentXml=sw.toString();
+			
+			//passing @Consume data to the ws method
+			OutputStream ous=con.getOutputStream();
+			
+			ous.write(studentXml.getBytes());
+			ous.flush();
+			ous.close();
+			
+			//reading the @Produce data from the ws method
+		BufferedReader br=new BufferedReader(new InputStreamReader(con.getInputStream()));
+		
+		String result=br.readLine();
+		
+		System.out.println(result);		
+				
+	}	
+}
+
+
+
+
+Student.java:-
+--------------
+
+--from prev appl.
+
+
+
+
+
+Example of Transferring the JSON obj using Jersey 1.x and its client :-
+=====================================================================
+
+StudentRs1App:-
+-------------
+
+
+
+
+Student.java:-
+-------------
+
+package com.ratan.bean;
+
+public class Student {
+
+	int sid;
+	String name;
+	String email;
+	String mobile;
+	public int getSid() {
+		return sid;
+	}
+	public void setSid(int sid) {
+		this.sid = sid;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getMobile() {
+		return mobile;
+	}
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+	public Student(int sid, String name, String email, String mobile) {
+		super();
+		this.sid = sid;
+		this.name = name;
+		this.email = email;
+		this.mobile = mobile;
+	}
+	
+	public Student() {
+		// TODO Auto-generated constructor stub
+	}	
+}
+
+
+
+StudentDao.java:-
+----------------
+
+package com.ratan.dao;
+
+import com.ratan.bean.Student;
+
+public interface StudentDao {
+
+	
+	public Student getStudent(int sid);
+	
+	
+	public void saveStudent(Student s);
+	
+	public void updateStudent(Student s);
+	
+	public void removeStudent(int sid);
+		
+}
+
+
+
+StudentDaoImpl.java:-
+--------------------
+
+package com.ratan.dao;
+
+import com.ratan.bean.Student;
+
+public class StudentDaoImpl implements StudentDao{
+
+	@Override
+	public Student getStudent(int sid) {
+
+	Student s=new Student(100, "Rama","r@123","123456");
+	
+	return s;
+	
+	
+	}
+
+	@Override
+	public void saveStudent(Student s) {
+		System.out.println("Student id is :"+s.getSid());
+		System.out.println("Student Name is :"+s.getName());
+		System.out.println("Student Email is :"+s.getEmail());
+		System.out.println("Student Mobile is :"+s.getMobile());
+		
+	}
+
+	@Override
+	public void updateStudent(Student s) {
+
+		System.out.println("Student id is :"+s.getSid());
+		System.out.println("Student Name is :"+s.getName());
+		System.out.println("Student Email is :"+s.getEmail());
+		System.out.println("Student Mobile is :"+s.getMobile());
+		
+	}
+
+	@Override
+	public void removeStudent(int sid) {
+	System.out.println("Student removed :"+sid);
+		
+	}
+
+}
+
+
+StudentService.java:-
+---------------------
+
+package com.ratan.rs;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
+import com.ratan.bean.Student;
+import com.ratan.dao.StudentDao;
+import com.ratan.dao.StudentDaoImpl;
+
+
+@Path("/student")
+public class StudentService {
+
+	StudentDao dao;
+	
+	
+	public StudentService() {
+		dao=new StudentDaoImpl();
+	}
+	
+	
+	
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getStudentDetails(@PathParam("id") int sid){
+		
+		Student s=dao.getStudent(sid);
+		ResponseBuilder rb=Response.status(200);
+		rb.entity(s);
+		return rb.build();
+		
+		
+	}
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createStudent(Student s){
+		dao.saveStudent(s);
+		ResponseBuilder rb=Response.status(200);
+		rb.entity("Created Resource successfully..");
+		return rb.build();
+		
+		
+		
+	}
+	
+	
+	@DELETE
+	@Path("/{id}")
+	public Response removeStudent(@PathParam("id") int sid){
+		
+		dao.removeStudent(sid);
+		
+		ResponseBuilder rb=Response.status(200);
+		rb.entity("Removed sucess...");
+		return rb.build();
+		
+		
+	}	
+	
+}
+
+
+Note:- if ws method has @Produce("application/json") then returned obj will be automatically converted to the json obj.
+
+--but if the ws method has @Consume("application/json") then in order to pass object as json format we need to add follwing dependency in pom.xml file.
+
+--jersey internally uses Jackson api to convert java to json.
+
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-core</artifactId>
+    <version>2.2.0</version>
+</dependency>
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.2.0</version>
+</dependency>
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-annotations</artifactId>
+    <version>2.2.0</version>
+</dependency>
+
+<dependency>
+    <groupId>org.codehaus.jackson</groupId>
+    <artifactId>jackson-core-asl</artifactId>
+    <version>1.9.0</version>
+</dependency>
+
+ 
+
+
+
+
+
+web.xml:-
+--------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+
+<servlet>
+
+<servlet-name>one</servlet-name>
+<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+
+<init-param>
+<param-name>com.sun.jersey.config.property.packages</param-name>
+<param-value>com.ratan.rs</param-value>
+</init-param>
+
+
+<init-param>
+<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+<param-value>true</param-value>
+</init-param>
+
+<load-on-startup>1</load-on-startup>
+
+</servlet>
+
+
+<servlet-mapping>
+
+<servlet-name>one</servlet-name>
+<url-pattern>/*</url-pattern>
+
+</servlet-mapping>
+
+
+</web-app>
+
+
+
+
+copy all the jar files in the lib folder and run in the server of eclipse
+
+
+http://localhost:8080/app/student/1
+
+
+
+
+Normal client for above all service by using networking api:-
+============================================================
+
+package p1;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class Test {
+
+	public static void main(String[] args)throws Exception {
+		
+		System.out.println("Getting the Student Details :");
+
+		getStudentDetails();
+		
+	}
+
+	public static void getStudentDetails()throws Exception{
+		
+		
+		//calling createStudent(-) method
+
+		/*URL u=new URL("http://localhost:8088/jaxrsapp3withjson_nrsh/student/");
+		
+		HttpURLConnection con=(HttpURLConnection)u.openConnection();
+		
+		con.setRequestMethod("POST");
+
+		//setting format of @Consume
+		con.setRequestProperty("Content-Type", "application/json");
+		
+
+		 con.setDoOutput(true); //this is to enable writing
+		 con.setDoInput(true);  //this is to enable reading
+		 
+
+		 Student st=new Student(100, "Rama", 5000);
+		
+		 //converting java obj to the json format
+		 String studentJson=JsonUtil.convertJavaToJson(st);
+		 System.out.println(studentJson);
+				
+			//passing @Consume data to the ws method
+			OutputStream ous=con.getOutputStream();
+			
+			ous.write(studentJson.getBytes());
+			ous.flush();
+			ous.close();
+		
+		//reading the @Produce data from the ws method
+		BufferedReader br=new BufferedReader(new InputStreamReader(con.getInputStream()));
+		
+		String result=br.readLine();
+		
+		System.out.println(result);		
+		
+	*/
+
+		//calling removeStudent(-) method
+
+		
+	      /*URL u=new URL("http://localhost:8088/testWsproject1/rest/student/2");
+		
+		HttpURLConnection con=(HttpURLConnection)u.openConnection();
+		
+		con.setRequestMethod("DELETE");
+		con.setRequestProperty("Accept", "application/json");//setting @Produce format
+		
+		con.setDoOutput(true); //this is to enable writing
+		 
+			//reading the @Produce data from the ws method
+		BufferedReader br=new BufferedReader(new InputStreamReader(con.getInputStream()));
+		
+		String result=br.readLine();
+		
+		System.out.println(result);	
+			
+
+	*/
+		//calling getStudentDetails(-) method
+
+		
+	      /*URL u=new URL("http://localhost:8088/testWsproject1/rest/student/2");
+		
+		HttpURLConnection con=(HttpURLConnection)u.openConnection();
+		
+		con.setRequestMethod("GET");
+		con.setRequestProperty("Accept", "application/json");//setting @Produce format
+		
+		con.setDoOutput(true); //this is to enable writing
+		 
+			//reading the @Produce data from the ws method
+		BufferedReader br=new BufferedReader(new InputStreamReader(con.getInputStream()));
+		
+		String result=br.readLine();
+		
+		System.out.println(result);	
+			
+
+	*/
+		
+
+
+	}
+	
+	
+}
+
+
+
+JsonUtil.java:-
+---------------
+
+package com.ratan.ws.util;
+
+import java.io.IOException;
+
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class JsonUtil {
+
+	public static <T> T convertJsonToJava(String jsonStr,Class<T> targetClass){
+
+		T respose=null;
+
+		try{
+
+		ObjectMapper om=new ObjectMapper();
+		respose=om.readValue(jsonStr,targetClass);
+
+		}catch(JsonMappingException je){
+		je.printStackTrace();
+		}
+		catch(IOException e){
+		e.printStackTrace();
+		}
+		return respose;
+		}
+
+
+		public static String convertJavaToJson(Object obj){
+
+		String json="{}";
+
+		ObjectMapper om=new ObjectMapper();
+
+		try{
+		json=om.writeValueAsString(obj);
+
+		}catch(Exception e){
+		e.printStackTrace();
+		}
+
+
+		return json;
+
+	}
+}
+
+
+
+
+
+	
+
+
+
+
+
+
+JAX-RS 2.x:-
+============
+
+
+
+--in JAX-RS 2.0 api,an alternate is given for web.xml configuration,we need to create an application class ,by extending it from an abstract class called "Application" or ResourceConfig.
+
+--ResorceConfig is the child class of Application.
+
+
+Note:- we can still work with web.xml file in Jersey 2.x also.
+
+the builtin  Servlet file we need to cfg in web.xml is (if we r using web.xml file):-
+
+"org.glassfish.jersey.servlet.ServletContainer".
+
+
+
+
+ex 1:-using Applicaiton class.
+
+
+
+@ApplicationPath("rest").......//it will converted to "/rest/*" internally
+public class MyApplication extends Application
+{
+
+private Set s;
+
+public MyApplication
+{
+s=new HashSet();
+
+s.add(new SampleService());
+
+
+
+}
+
+
+@Override
+public Set getSingletons()
+{
+return s;
+}
+
+} 
+
+
+
+ex:-2 using ResourceConfig class:-
+
+
+@ApplicationPath("myapp")
+public class MyResource extends ResourceConfig{
+
+	
+	public MyResource() {
+		packages("com.ratan.ws.p1");//it will auto scan the root resource class.
+	}
+}	
+
+
+
+
+
+
+
+
+creating a RS ws and its client appl in java using JAX-RS 2.0 api:-
+===================================================================
+
+
+--download jersey 2.x RI bundle and extract the zip file.we will get a folder with name JAX-RS-RI.
+
+
+--with Jersey 2.x,JAX-RS-2.0 api jar file,jersey implementation jar files and the required third party jar files all downloaded and they r placed in three folders:-
+
+api,lib,ext.
+
+
+
+Example 1:-
+
+create a RS ws appl in eclipse like the following:-
+--------------------------------------------------
+
+
+App2
+ |
+ |--java Resources
+	|
+	|--src
+	    |--com.ratan.app
+			|---MyResources.java
+
+	    |--com.ratan.ws
+			|---SampleService.java
+|--WebContent
+	|--WEB-INF
+		|--lib
+		    |---*.jar
+
+
+
+
+
+
+
+
+MyResource.java:- using Application class.
+-----------------
+
+package com.ratan.app;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+
+import com.ratan.ws.SampleService;
+
+@ApplicationPath("rest")
+public class MyResource extends Application{
+
+	
+	private Set s;
+	
+	public MyResource() {
+		s=new HashSet();
+		s.add(new SampleService());
+	}
+	
+	@Override
+	public Set getSingletons() {
+		// TODO Auto-generated method stub
+		return s;
+	}
+		
+}
+
+
+
+or 
+
+
+
+MyResource.java:- using ResourceConfig class.
+-----------------
+
+package com.ratan.app;
+
+import javax.ws.rs.ApplicationPath;
+import org.glassfish.jersey.server.ResourceConfig;
+
+@ApplicationPath("myapp")
+public class MyResource extends ResourceConfig{
+
+	
+	public MyResource() {
+		packages("com.ratan.ws");
+	}
+	
+}
+
+
+
+SampleService.java:-
+-------------------
+
+package com.ratan.ws;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+@Path("/sample")
+public class SampleService {
+
+	@GET
+	@Produces("text/html")
+	@Path("/{uname}")
+	public String sayHello(@PathParam("uname") String s) {
+
+		return "<h1>Hello1 " + s + "</h1>";
+
+	}
+
+	@GET
+	@Path("hello/{uname}-{fname}")
+	@Produces("text/html")
+	public String sayHello2(@PathParam("uname") String uname,
+			@PathParam("fname") String fname) {
+
+		return "<body bgcolor='pink'><h1>Hello3 " + uname + fname
+				+ "</h1></body>";
+
+	}
+
+	@GET
+	@Produces("text/plain")
+	public String sayBye() {
+
+		return "Bye";
+
+	}
+
+}
+
+
+
+
+--add all the jar files from api,ext,and lib folder to of JAXRS-RI folder to our appl lib folder.
+
+--seperatly download the asm-3.1.jar and eglib-2.2.jar and add it to the lib folder if any error comes..
+
+
+run the project:-
+
+
+
+to develop and run using Maven:-
+===============================
+
+step 1:- develop a normal dynamic web application and convert it as maven project:-
+
+right click on project--->Configure----->convert to maven project..
+
+step 2:- add the following dependency  after <build> tag:-
+
+
+
+<dependencies>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>2.20</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>2.20</version>
+        </dependency>
+        
+        <!-- https://mvnrepository.com/artifact/cglib/cglib -->
+<dependency>
+    <groupId>cglib</groupId>
+    <artifactId>cglib</artifactId>
+    <version>3.1</version>
+</dependency>
+                
+    </dependencies>  
+  
+
+step 3: run the project.
+
+
+
+
+***
+
+
+
+Using the client API of JAX-RS 2.0 creating a console client appl for the above ws:-
+===================================================================================
+
+--to create the standalone client application for Jersey 2.x ws:-
+
+--create the normal java project and convert it into maven project and add the following dependency:-
+
+
+<dependency>
+    <groupId>org.glassfish.jersey.core</groupId>
+    <artifactId>jersey-client</artifactId>
+    <version>2.25.1</version>
+</dependency>
+
+
+
+and if we want to use JSON api then add only one dependency(unlike in jersey 1.x where we added 4 jackson related dependency):-
+
+
+<dependency>
+    <groupId>org.glassfish.jersey.media</groupId>
+    <artifactId>jersey-media-json-jackson</artifactId>
+    <version>2.25.1</version>
+</dependency>
+  
+
+
+
+
+
+Restclient
+	|--p1
+	    |--Test.java
+
+
+package p1;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+
+public class Test {
+
+	public static void main(String[] args) {
+		
+		Client c=ClientBuilder.newClient();
+
+		
+	//call the first service....	
+	WebTarget target=c.target("http://localhost:8082/jaxrs2project/rest/sample");
+
+	target=target.path("{uname}").resolveTemplate("uname","Rama");
+
+	//String str2=(String)target.request().get(String.class);
+		
+		Response rs=target.request().get();
+		
+		String str=(String)rs.getEntity(String.class);
+		
+		System.out.println(str);
+		System.out.println("=================");
+
+	//call the second service..	
+		
+		WebTarget target2=c.target("http://localhost:8082/jaxrs2project/rest/sample");
+
+		Map m=new HashMap();
+		m.put("uname", "Rama");
+		m.put("fname", "kumar");
+		
+		target2=target2.path("/hello{uname}-{fname}").resolveTemplates(m);
+		//target2=target2.path("/hello{fname}").resolveTemplate("fname","kumar");
+		
+		String str2=(String)target2.request().get(String.class);
+		
+		System.out.println(str2);
+		System.out.println("===================");
+	
+		//call the third method...
+		
+		WebTarget target3=c.target("http://localhost:8082/jaxrs2project/rest/sample");
+
+		Response rs2=target3.request().get();
+			
+			String str3=(String)rs2.readEntity(String.class);
+			
+			System.out.println(str3);
+		
+		
+		
+	}
+
+}
+
+
+set class path for all jar files belongs to api,ext,lib folder. or build path for eclipse.
+
+
+
+Note:- the entry point for creating a client Appl using client api of JAXRS is "Client" obj.
+
+--Client is an interface and we can get an object of this type by calling static factory method newClient() of an abstract class ClientBuilder.
+
+--to call the resource of a root resource class,we need a WebTarget obj for the url.
+
+--we can append a path to a WebTarget by calling a path() method, when a RS WS method is called then the output obj will be added to "Response(Abs class)" obj and then Response obj will be return back to the client obj.  
+
+
+
+
+
+
+Example2:- of Transferring the JSON obj using Jersey 2.x and its client :-
+=========================================================================
+
+StudentRs2App:-(using web.xml and Jersey2.x client)
+=============
+
+
+
+pom.xml:-
+--------
+
+for jersey2.x dependency is:-
+
+
+<dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>2.20</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>2.20</version>
+        </dependency>
+        
+        <!-- https://mvnrepository.com/artifact/cglib/cglib -->
+<dependency>
+    <groupId>cglib</groupId>
+    <artifactId>cglib</artifactId>
+    <version>3.1</version>
+</dependency>
+
+
+*****and for using Jackson api for json,the dependency is :-
+
+
+<dependency>
+    <groupId>org.glassfish.jersey.media</groupId>
+    <artifactId>jersey-media-json-jackson</artifactId>
+    <version>2.25.1</version>
+</dependency>
+  
+
+*****here no need to add dependency for JaxB api.
+
+
+
+
+
+Student.java:-
+-------------
+
+package com.ratan.ws.bean;
+
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
+@XmlRootElement(name="student")
+@XmlType(propOrder={"roll","name","marks"})
+public class Student implements Serializable {
+
+	private int roll;
+	private String name;
+	private int marks;
+	
+	public Student() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	@XmlElement
+	public int getRoll() {
+		return roll;
+	}
+
+	public void setRoll(int roll) {
+		this.roll = roll;
+	}
+
+	@XmlElement
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@XmlElement
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
+	public Student(int roll, String name, int marks) {
+		super();
+		this.roll = roll;
+		this.name = name;
+		this.marks = marks;
+	}
+	
+	
+	
+}
+
+
+
+StudentDao.java:-
+----------------
+
+package com.ratan.dao;
+
+import com.ratan.bean.Student;
+
+public interface StudentDao {
+
+	
+	public Student getStudent(int roll);
+	
+	
+	public void saveStudent(Student s);
+	
+	public void updateStudent(Student s);
+	
+	public void removeStudent(int roll);
+		
+}
+
+
+
+StudentDaoImpl.java:-
+--------------------
+
+package com.ratan.dao;
+
+import com.ratan.bean.Student;
+
+public class StudentDaoImpl implements StudentDao{
+
+	@Override
+	public Student getStudent(int roll) {
+
+	Student s=new Student(roll, "Rama",500);
+	
+	return s;
+	
+	
+	}
+
+	@Override
+	public void saveStudent(Student s) {
+		System.out.println("Student id is :"+s.getSid());
+		System.out.println("Student Name is :"+s.getName());
+		System.out.println("Student Marks is :"+s.getMarks());
+		
+	}
+
+	@Override
+	public void updateStudent(Student s) {
+
+		System.out.println("Student id is :"+s.getSid());
+		System.out.println("Student Name is :"+s.getName());
+		System.out.println("Student Marks is :"+s.getMarks());
+				
+	}
+
+	@Override
+	public void removeStudent(int roll) {
+	System.out.println("Student removed :"+roll);
+		
+	}
+
+}
+
+
+StudentService.java:-
+---------------------
+
+package com.ratan.rs;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
+import com.ratan.bean.Student;
+import com.ratan.dao.StudentDao;
+import com.ratan.dao.StudentDaoImpl;
+
+@Path("/student")
+public class StudentService {
+
+	StudentDao dao;
+
+	public StudentService() {
+		dao = new StudentDaoImp();
+	}
+
+		//1.producing json obj from java obj by accepting PathParam
+	@GET
+	@Path("/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getStudentDetails(@PathParam("id") int sid) {
+
+		Student s = dao.getStudent(sid);
+		ResponseBuilder rb = Response.status(200);
+		rb.entity(s);
+		return rb.build();
+
+	}
+
+		//2.accepting json and produsing xml 
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_XML)
+	public Student createStudent(Student s) {
+		dao.saveStudent(s);
+		// dummy obj (incomming obj converted from json to xml)
+		return s;// this obj will be returnd in the form of xml
+
+	}
+		//3.accepting xml and produsing json
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_XML)
+	public Response createStudent2(Student s) {
+		dao.saveStudent(s);
+
+		// dummy obj (incomming obj converted from xml to json)
+		ResponseBuilder rb = Response.status(200);
+		rb.entity(s);// this obj will be returnd in the form of json
+		return rb.build();
+
+	}
+		//4.accepting json and producing plain text
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response createStudent3(Student s) {
+		dao.saveStudent(s);
+
+		ResponseBuilder rb = Response.status(200);
+		rb.entity("Created Resource successfully..");
+		return rb.build();
+
+	}
+		//5.deleting by PathParam and returning plain text 
+	@DELETE
+	@Path("/{id}")
+	public Response removeStudent(@PathParam("id") int sid) {
+
+		dao.removeStudent(sid);
+
+		Response.ResponseBuilder rb = Response.status(200);
+		rb.entity("Removed sucess...");
+		return rb.build();
+
+	}
+
+}
+
+
+
+
+
+web.xml:-
+--------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+
+<servlet>
+
+   <servlet-name>one</servlet-name>
+<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+
+<init-param>
+<param-name>jersey.config.server.provider.packages</param-name>
+<param-value>com.ratan.ws.myws</param-value>
+</init-param>
+
+<load-on-startup>1</load-on-startup>
+
+</servlet>
+
+
+<servlet-mapping>
+
+<servlet-name>one</servlet-name>
+<url-pattern>/rest/*</url-pattern>
+
+</servlet-mapping>
+
+
+</web-app>
+
+
+
+
+copy all the jar files in the lib folder and run in the server of eclipse
+
+
+http://localhost:8080/app/student/1
+
+
+
+client for above all service by using Jersey2.x client api:-
+===========================================================
+
+Note:- if the client application is in the same project then,no need to add any extra dependency.
+and if the client is a seperate application in a seperate project then just add the following dependency:-
+
+
+--here in the client application,JsonUtil.java for above StudentRs1App,for converting javatojson and jsontojava is not required.jersey2 automatically convert that value.
+
+
+<dependency>
+    <groupId>org.glassfish.jersey.core</groupId>
+    <artifactId>jersey-client</artifactId>
+    <version>2.25.1</version>
+</dependency>
+
+
+
+and if we want to use JSON api then add only one dependency(unlike in jersey 1.x where we added 4 jackson related dependency):-
+
+
+<dependency>
+    <groupId>org.glassfish.jersey.media</groupId>
+    <artifactId>jersey-media-json-jackson</artifactId>
+    <version>2.25.1</version>
+</dependency>
+  
+
+--if we want to add xml api then add:-
+
+  <dependency>
+    <groupId>org.glassfish.jersey.media</groupId>
+    <artifactId>jersey-media-jaxb</artifactId>
+    <version>2.18</version>
+</dependency>
+
+
+
+package p1;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation.Builder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+
+public class TestClient {
+
+	public static void main(String[] args) {
+
+		Client c=ClientBuilder.newClient();
+		
+		//1.producing json obj from java obj by accepting PathParam
+		
+		/*WebTarget target=c.target("http://localhost:8088/testWsproject2/rest/student/2");
+		
+		//or
+
+		//WebTarget target=c.target("http://localhost:8088/testWsproject2/rest/student/");
+		//target=target.path("{id}").resolveTemplate("id", 2);
+		
+
+		Builder b=target.request(MediaType.APPLICATION_JSON);//@Produce
+		String rs=b.get(String.class);
+		
+		System.out.println(rs);
+		*/
+		
+		//2.accepting json and producing xml 
+
+		/*
+		WebTarget target=c.target("http://localhost:8088/testWsproject2/rest/student/");
+		
+		Student st=new Student(10, "Arun", 650);
+		
+		Builder b=target.request(MediaType.APPLICATION_XML);//@Produce MIME type
+		Response rs=b.post(Entity.entity(st,MediaType.APPLICATION_JSON));//@Consume MIME type
+		
+		System.out.println(rs.getStatus());
+		String ss=rs.readEntity(String.class);
+		
+		System.out.println(ss);
+		*/
+
+		//3.accepting xml and produsing json
+
+		/*
+		WebTarget target=c.target("http://localhost:8088/testWsproject2/rest/student/");
+		
+		Student st=new Student(10, "Arun", 650);
+		
+		Builder b=target.request(MediaType.APPLICATION_JSON);//@Produce MIME type
+		Response rs=b.post(Entity.entity(st,MediaType.APPLICATION_XML));//@Consume MIME type
+		
+		System.out.println(rs.getStatus());
+		String ss=rs.readEntity(String.class);
+		
+		System.out.println(ss);
+		*/
+		
+		//4.accepting json and producing plain text
+			
+		/*
+		WebTarget target=c.target("http://localhost:8088/testWsproject2/rest/student/");
+		
+		Student st=new Student(10, "Arun", 650);
+		
+		//Builder b=target.request(MediaType.TEXT_PLAIN);//@Produce MIME type
+		//or
+		Builder b=target.request();//@Produce MIME type defualt is text/plain
+		
+		//Response rs=b.post(Entity.entity(st,MediaType.APPLICATION_JSON));//@Consume MIME type
+		//or
+		Response rs=b.post(Entity.json(st));//@Consume method MIME type
+
+		
+		System.out.println(rs.getStatus());
+		String ss=rs.readEntity(String.class);
+		
+		System.out.println(ss);
+		*/
+
+		//5.deleting by PathParam and returning plain text 
+		
+		/*
+		WebTarget target=c.target("http://localhost:8088/testWsproject2/rest/student/2");
+
+		Builder b=target.request(MediaType.TEXT_PLAIN);
+		Response rs=b.delete();
+		
+		System.out.println(rs.getStatus());
+		String ss=rs.readEntity(String.class);
+		
+		System.out.println(ss);
+		
+
+		*/		
+				
+
+		
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+Example 3:- CRUD appl using Client api of JAX-RS 2.
+===================================================
+
+--without using web.xml
+
+BookCrudRestApp:-
+	|	
+	|---src
+	     |
+	     |--com.ratan.app
+	     |  	|------MyResource.java
+	     |--com.ratan.repository
+	     |		|------Book.java
+    	     |		|------BookRepo.java
+	     |
+	     |--com.ratan.service
+			|------BookService.java
+
+
+
+pom.xml:- same as previous appl.
+
+
+
+Book.java:-
+------------
+
+
+
+package com.ratan.repository;
+
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
+public class Book implements Serializable{
+
+	
+	int bookid;
+	String bookName;
+	int price;
+	
+	public Book() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public int getBookid() {
+		return bookid;
+	}
+
+	public void setBookid(int bookid) {
+		this.bookid = bookid;
+	}
+
+	public String getBookName() {
+		return bookName;
+	}
+
+	public void setBookName(String bookName) {
+		this.bookName = bookName;
+	}
+
+	public int getPrice() {
+		return price;
+	}
+
+	public void setPrice(int price) {
+		this.price = price;
+	}
+
+	public Book(int bookid, String bookName, int price) {
+		super();
+		this.bookid = bookid;
+		this.bookName = bookName;
+		this.price = price;
+	}
+	
+}
+
+
+
+
+BookRepo.java:-
+---------------
+
+package com.ratan.repository;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+public class BookRepo {
+
+	Set<Book> theBooks;
+
+	public BookRepo() {
+		theBooks = new HashSet<Book>();
+	}
+
+	public boolean saveBook(Book b) {
+		boolean flag = false;
+		int num = 0;
+
+		int id = b.getBookid();
+
+		Iterator it = theBooks.iterator();//checking for duplicate
+
+		while (it.hasNext()) {
+
+			Book b1 = (Book) it.next();
+
+			if (id == b1.getBookid())
+				num = 1;
+		}
+
+		if (num == 0) {
+			theBooks.add(b);
+			flag = true;
+		}
+		return flag;
+	}
+
+	public Book getBookById(int id) {
+
+		Book b = null;
+
+		if (theBooks.size() > 0) {
+			Iterator it = theBooks.iterator();
+
+			while (it.hasNext()) {
+				Book b1 = (Book) it.next();
+				if (b1.getBookid() == id) {
+					b = b1;
+				}
+			}
+
+		}
+
+		return b;
+	}
+
+	public boolean deteteBook(int bid) {
+
+		boolean flag = false;
+
+		if (theBooks.size() > 0) {
+
+			Iterator it = theBooks.iterator();
+
+			while (it.hasNext()) {
+
+				Book b1 = (Book) it.next();
+				if (b1.getBookid() == bid) {
+					theBooks.remove(b1);
+					flag = true;
+				}
+
+			}
+
+		}
+
+		return flag;
+
+	}
+
+}
+
+
+
+BookService.java:-
+-----------------
+
+package com.ratan.service;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import com.ratan.repository.Book;
+import com.ratan.repository.BookRepo;
+
+
+@Path("BookService")
+public class BookService {
+
+	
+	BookRepo br;
+	
+	public BookService() {
+		br=new BookRepo();
+	}
+	
+	
+	
+	@POST
+	@Path("/save")
+	@Consumes(MediaType.APPLICATION_XML)
+	@Produces(MediaType.TEXT_PLAIN)
+	public String save(Book b){
+		boolean f=br.saveBook(b);
+		if(f)
+			return "Book is Saved...";
+		else
+			return "Sorry book already exist..";
+	}
+	
+	
+	
+	@GET
+	@Path("/find/{id}")
+	@Produces(MediaType.APPLICATION_XML)
+	public Book find(@PathParam("id")int id){
+		
+		Book b=br.getBookById(id);
+		
+		return b;
+	}
+	
+	
+	
+	
+	@DELETE
+	@Path("delete/{id}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String delete(@PathParam("id")int id){
+		
+		boolean f=br.deteteBook(id);
+		if(f)
+			return "book deleted sucess";
+		else
+			return "book does not exist.";
+		
+	}
+	
+	
+	@GET
+	@Path("p")
+	@Produces("text/html")
+	public String getMSG(){
+		return "<h1>Hello</h1>";
+	}
+	
+	
+}
+
+
+
+MyResource.java:-
+------------------
+
+package com.ratan.app;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+
+import com.ratan.service.BookService;
+
+@ApplicationPath("rest")
+public class MyResource extends Application{
+
+	Set s;
+	
+	
+	public MyResource() {
+		s=new HashSet();
+		s.add(new BookService());
+	}
+	
+	@Override
+	public Set getSingletons() {
+		// TODO Auto-generated method stub
+		return s;
+	}
+	
+}
+
+
+
+client Appl for above all services of Application:-
+--------------------------------------------------
+
+Test.java:-
+-----------
+
+package p1;
+
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+
+public class Test {
+
+	public static void main(String[] args) {
+		
+		Client c=ClientBuilder.newClient();
+		
+		//calling save operation
+
+		/*
+		WebTarget wt=c.target("http://localhost:8082/bookrestapp/rest/BookService");
+		
+		wt=wt.path("/save");
+		
+		Book b=new Book(101, "headfirst2", 350);
+		
+		String s=wt.request().post(Entity.xml(b),String.class);
+		
+		System.out.println(s);
+		
+		System.out.println("=========================");
+		
+		 */
+		
+
+
+		//calling find operation
+		
+		/*WebTarget wt=c.target("http://localhost:8082/bookrestapp/rest/BookService");
+		
+		wt=wt.path("/find/{id}").resolveTemplate("id", 102);
+		
+		//Book b=(Book)wt.request().get(Book.class);
+		
+		//or
+		
+		Builder bld=wt.request();//@Produce MIME type defualt is text/plain
+		Response rs=bld.get();
+		
+		System.out.println(rs.getStatus());
+		Book b=rs.readEntity(Book.class);
+
+		
+		
+		if(b != null){
+			System.out.println(b.getBookid());
+			System.out.println(b.getBookName());
+			System.out.println(b.getPrice());
+		}
+		else
+			System.out.println("not found...");
+	*/
+		
+		
+		//calling delete operation
+		
+		WebTarget wt=c.target("http://localhost:8082/bookrestapp/rest/BookService");
+		
+		wt=wt.path("/delete/{id}").resolveTemplate("id", 101);
+		
+		String s=(String)wt.request().delete(String.class);
+		System.out.println(s);
+		
+	}
+
+}
+
+
+
+
+Example 4:- real time web application using servlet and Restfull using Jersey2.x client api. 
+
+
+--create a dynamic webapplication and convert it as maven project
+
+
+--add the following dependencies in pom.xml of Service app:-
+
+
+
+ <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>2.20</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>2.20</version>
+        </dependency>
+        
+        <!-- https://mvnrepository.com/artifact/cglib/cglib -->
+<dependency>
+    <groupId>cglib</groupId>
+    <artifactId>cglib</artifactId>
+    <version>3.1</version>
+</dependency>
+                
+
+<dependency>
+    <groupId>org.glassfish.jersey.media</groupId>
+    <artifactId>jersey-media-json-jackson</artifactId>
+    <version>2.25.1</version>
+</dependency>
+
+
+  <dependency>
+    <groupId>org.glassfish.jersey.media</groupId>
+    <artifactId>jersey-media-jaxb</artifactId>
+    <version>2.18</version>
+</dependency>
+
+
+
+--add the following dependencies in pom.xml of client app:-
+
+  
+
+***reffer:- servletasEnpointandApp
+
+
+
+
+Note:- when a WS method retuning a List obj in the form of List<> or Response obj as 'application/xml' or 'application/json' then in order to access that List obj in Client Appl we can use following 2 methods :-
+
+
+1.json api related methods for Json or JaxB related methods(Marshalling and UnMarshalling) for xml.
+
+2.Using GenericType class.
+
+
+ex:1- for Json
+
+Service side:-
+
+
+	@GET
+	@Path("getAllStudents")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllStudentDetails(){
+		
+		List<Student> students=dao.getAllStudents();
+		
+		return Response.status(200).entity(students).build();	
+	}
+	
+
+
+ClientSide:-using Json api:-
+
+
+		Client client=ClientBuilder.newClient();
+		
+		WebTarget wt=client.target						("http://localhost:8088/jersey2finalservice/rest/studentApp/getAllStudents");
+		
+		String jsontype=wt.request().get(String.class);
+		
+		TypeReference<List<Student>> maptype=new TypeReference<List<Student>>() {};
+		
+		ObjectMapper om=new ObjectMapper();
+		
+		List<Student> students=om.readValue(jsontype, maptype);
+		
+
+
+ClientSide:-using GenericType:-
+
+
+		Client client=ClientBuilder.newClient();
+		
+		WebTarget wt=client.target											("http://localhost:8088/jersey2finalservice/rest/studentApp/getAllStudents");
+
+		Response res=wt.request().get();
+		
+		GenericType<List<Student>> type=new GenericType<List<Student>>(){};
+		
+		List<Student> students=res.readEntity(type);
+		
+reffer above example
+
+
+ex:2- for xml
+
+Service side:- to send the List using XMl we need to wrap the List obj into the GenericEntity obj. 
+
+
+	@GET
+	@Path("getAllStudents")
+	@Produces(MediaType.APPLICATION_XML)
+	public Response getAllStudentDetails(){
+		
+		List<Student> students=dao.getAllStudents();
+
+		GenericEntity<List<Student>> ge=new GenericEntity<List<Student>>(students){};		
+		
+		return Response.status(200).entity(ge).build();	
+	}
+	
+
+
+
+ClientSide:-using GenericType:-
+
+
+		Client client=ClientBuilder.newClient();
+		
+		WebTarget wt=client.target									("http://localhost:8088/jersey2finalservice/rest/studentApp/getAllStudents");
+
+		Response res=wt.request().get();
+		
+		GenericType<List<Student>> type=new GenericType<List<Student>>(){};
+		
+		List<Student> students=res.readEntity(type);
+		
+
+
+
+
+
+
+
+
+
+
+exApp:- webapplication with web.xml client is jsp using jersey 2.x
+====================================================================
+
+
+
+jerseywebApp1
+	|
+	|--com.ratan.beans
+			|--Student.java
+	|
+	|--com.ratan.ws.myws
+			|--StudentService.java
+	|
+	|--WebContent
+		|
+		|--index.jsp
+		|
+		|--WEB-INF
+			|--web.xml
+
+
+
+
+
+
+
+
+
+
+
+
+
+step 1:-create a dynamic webapplication and convert it as a maven project.
+
+
+step 2:- add the following dependencies:-
+
+
+          <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>2.20</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+            <version>2.20</version>
+        </dependency>
+        
+        <!-- https://mvnrepository.com/artifact/cglib/cglib -->
+<dependency>
+    <groupId>cglib</groupId>
+    <artifactId>cglib</artifactId>
+    <version>3.1</version>
+</dependency>
+                
+  
+  <dependency>
+    <groupId>org.glassfish.jersey.media</groupId>
+    <artifactId>jersey-media-json-jackson</artifactId>
+    <version>2.25.1</version>
+</dependency>
+
+
+
+step 3:- create a web.xml file under WEB-INF folder as follows:-
+
+<web-app>
+
+<servlet>
+
+   <servlet-name>one</servlet-name>
+<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+
+<init-param>
+<param-name>jersey.config.server.provider.packages</param-name>
+<param-value>com.ratan.ws.myws</param-value>
+</init-param>
+
+<load-on-startup>1</load-on-startup>
+
+</servlet>
+
+
+<servlet-mapping>
+
+<servlet-name>one</servlet-name>
+<url-pattern>/rest/*</url-pattern>
+
+</servlet-mapping>
+
+
+
+
+</web-app>
+
+
+
+step 4:- create  Student.java(POJO) and StudentService(ws) classes:-
+
+Student.java:-
+-------------
+
+package com.ratan.ws.bean;
+
+import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
+@XmlRootElement(name="student")
+@XmlType(propOrder={"roll","name","marks"})
+public class Student implements Serializable {
+
+	private int roll;
+	private String name;
+	private int marks;
+	
+	public Student() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	@XmlElement
+	public int getRoll() {
+		return roll;
+	}
+
+	public void setRoll(int roll) {
+		this.roll = roll;
+	}
+
+	@XmlElement
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@XmlElement
+	public int getMarks() {
+		return marks;
+	}
+
+	public void setMarks(int marks) {
+		this.marks = marks;
+	}
+
+	public Student(int roll, String name, int marks) {
+		super();
+		this.roll = roll;
+		this.name = name;
+		this.marks = marks;
+	}
+	
+}
+
+
+StudentService.java:-
+---------------------
+
+package com.ratan.ws.myws;
+
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import com.ratan.ws.bean.Student;
+
+@Path("/student")
+public class StudentService {
+
+@Path("getStudent1")
+@POST
+@Produces(MediaType.APPLICATION_XML)
+public Response getStudentByRoll1(@FormParam("roll") int roll){
+	
+	Student st=new Student(roll, "Rama", 850);
+	
+	return Response.status(200).entity(st).build();
+	
+}
+	
+
+@Path("getStudent2")
+@GET
+@Produces(MediaType.APPLICATION_JSON)
+public Response getStudentByRoll2(@QueryParam("roll") int roll){
+	
+	Student st=new Student(roll, "Rama", 850);
+	
+	return Response.status(200).entity(st).build();
+	
+}
+
+}
+
+
+step 5:- create a index.jsp under WebContent folder:-
+
+
+index.jsp:-
+----------
+
+<body bgcolor="pink">
+
+<form action="rest/student/getStudent1" method="post">
+
+Enter Student Roll:<input type="text" name="roll"><br><br>
+
+<input type="submit" value="GetStudentXml">
+</form>
+
+<a href="rest/student/getStudent2?roll=200">GetStudentJson</a>
+
+
+</body>
+
+
+
+
+Note:- to run and execute the above application without web.xml file follow the 2 steps:-
+
+1.delete the web.xml file 
+
+2.create the following class:-
+
+
+MyAppCfg.java:-
+--------------
+
+
+
+package com.ratan.ws.cfg;
+
+import javax.ws.rs.ApplicationPath;
+
+import org.glassfish.jersey.server.ResourceConfig;
+
+
+@ApplicationPath("rest")
+public class MyAppCfg extends ResourceConfig{
+
+	public MyAppCfg() {
+		packages("com.ratan.ws.myws");
+	}
+}
+
+
+
+
+or
+
+
+
+package com.ratan.ws.cfg;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+
+import org.glassfish.jersey.server.ResourceConfig;
+
+import com.ratan.ws.myws.StudentService;
+
+
+@ApplicationPath("rest")
+public class MyAppCfg extends Application{
+
+public Set s;
+
+public MyAppCfg() {
+	s=new HashSet();
+	s.add(new StudentService());
+}
+
+@Override
+	public Set getSingletons() {
+		return s;
+	}
+
+
+}
+
+
+
+
+
+
+Getting Http headers in JAX-RS:-
+================================
+
+--by using the Http request headers we can access extra information from the client.
+
+--we have 2 ways to get the http headers in JAX-RS:-
+
+1.by directly injecting the @HeaderParam annoataion.
+
+2.programatically accessing using @Context annotation.
+
+
+@HeaderParam:-
+-------------
+
+ex:- to know from which browser the request is comming:-
+
+
+@Path("myapp")
+public class Myservice
+
+@GET
+public Response getBrowserName(@HeaderParam("user-agent") String ua){
+
+syso("this method is called from "+ua);
+
+return Response.status(200).entity(ua).build();
+
+}
+
+}
+
+
+
+
+
+@Context:-
+----------
+
+--as the alternate to the @HeaderParam we can also use @Context to get the "javax.ws.core.HttpHeaders".
+
+
+ex:-
+
+@Path("myapp")
+public class Myservice
+
+@GET
+public Response getBrowserName(@Context HttpHeaders headers){
+
+
+String ua=headers.getRequestHeader("user-agent").get(0);
+
+syso("this method is called from "+ua);
+
+return Response.status(200).entity(ua).build();
+
+}
+
+}
+
+
+
+
+List all the request Headers:-
+------------------------------
+
+
+
+	@GET
+	public Response getHeaderDetails(@Context HttpHeaders headers){
+
+			MultivaluedMap<String, String> map=headers.getRequestHeaders();
+
+			Set<String> keys=map.keySet();
+			
+			for(String key:keys){
+				System.out.println("Header name is :"+key);
+				
+				List<String> values=headers.getRequestHeader(key);
+				
+				for(String value:values){
+					System.out.println("Value is :"+value);
+				}
+				
+			}
+				
+	return Response.status(200).build();
+
+	}
+
+
+
+
+
+
+Getting Coockies by using JAX-RS:-
+====================================
+
+--We can retrieve the entire cookie by injecting the Cookie with the @CookieParam JAX-RS annotation. By providing the cookie name.
+
+ex:-
+
+@GET
+public Response getCookie(@CookieParam("name") Cookie cookie){
+    return Response.ok().build();
+}
+
+
+
+--We can also retrieve just the cookie value by injecting the value with the @CookieParam annotation.
+
+ex:-
+
+@GET
+public Response getCookieValue(@CookieParam("name") String cookie){
+    return Response.ok().build();
+}
+
+
+--To create a new HTTP response cookie we can simply add a new cookie via the ResponseBuilder by calling the cookie() method providing a NewCookie object. This method will add a new cookie to the response.
+
+ex:-
+
+@POST
+public Response createCookie(){
+    return Response
+            .ok()
+            .cookie(new NewCookie("name", "value"))
+            .build();
+}
+
+
+
+If we want to update an existing cookie, you can simply add a new cookie with the same name. This will override the existing cookie.
+
+ex:-
+
+
+@PUT
+public Response updateCookie(@CookieParam("name") Cookie cookie){
+    if (cookie != null){
+        return Response
+                .ok()
+                .cookie(new NewCookie("name", "new-value"))
+                .build();
+    }
+    return Response.ok().build();
+}
+
+
+--To delete an existing cookie you can set the maxAge property to 0. This will remove the cookie.
+
+ex:-
+
+@DELETE
+public Response deleteCookie(@CookieParam("name") Cookie cookie){
+    if (cookie != null){
+        NewCookie newCookie = new NewCookie(cookie, "delete cookie", 0, false);
+        return Response
+                .ok()
+                .cookie(newCookie)
+                .build();
+    }
+    return Response.ok().build();
+}
+
+
+
+
+
+Get List of All Cookies
+------------------------
+
+--You can retrieve a list of all cookies by injecting the HttpHeaders with the @Context annotation. From this object you can retrieve all the cookies from the HTTP Request.
+
+ex:-
+
+@GET
+public Response list(@Context HttpHeaders headers){
+    for (String name : headers.getCookies().keySet()) {
+        Cookie cookie = headers.getCookies().get(name);
+        System.out.println("Cookie: " + name + "=" + cookie.getValue());
+    }
+    return Response.ok().build();
+}
+
+
+
+
+--we can send cookies using the JAX-RS Client API by calling the Builder#cookie(name, value) method. This will add a request cookie to the HTTP Request.
+
+ex:-
+
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.Response;
+
+public class RunClient {
+
+    public static void main(String... args){
+        Client client = ClientBuilder.newClient();
+
+        Response response = client
+                .target("http://localhost:....")//url
+                .request()
+                .cookie("name", "value")
+                .get();
+
+        if (response.getStatus() == 200){
+            System.out.println("Response: " + response.readEntity(String.class));
+        }
+        client.close();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Using RestEasy :-
+=================
+
+--it is the jboss implementation of Jax-RS api,used to develop Restfull java appl and restfull webservices.
+
+--we can download the Resteasy software from "resteasy.jboss.org".
+
+--it restfull webservice,it is easy to migrate from one imple to another imple.
+
+--just we need to change the jar files.
+
+
+to develop the service and client we need to add the required jar files.
+
+--either we can download the s/w (zip) file and extract that file and place it in lib folder of our application or add the dependency by using maven.
+
+
+
+--to develop service app:- add the following dependency
+
+
+<!-- https://mvnrepository.com/artifact/org.jboss.resteasy/resteasy-jaxrs -->
+<dependency>
+    <groupId>org.jboss.resteasy</groupId>
+    <artifactId>resteasy-jaxrs</artifactId>
+    <version>3.0.11.Final</version>
+</dependency>
+
+
+--to develop client app:- add the following dependency
+
+
+<!-- https://mvnrepository.com/artifact/org.jboss.resteasy/resteasy-client -->
+<dependency>
+    <groupId>org.jboss.resteasy</groupId>
+    <artifactId>resteasy-client</artifactId>
+    <version>3.0.11.Final</version>
+</dependency>
+
+
+Note:- inorder to use the jaxb and json use the resteasy provided apis, following dependency :-
+
+
+<!-- https://mvnrepository.com/artifact/org.jboss.resteasy/resteasy-jaxb-provider -->
+<dependency>
+    <groupId>org.jboss.resteasy</groupId>
+    <artifactId>resteasy-jaxb-provider</artifactId>
+    <version>3.0.11.Final</version>
+</dependency>
+
+
+<!-- https://mvnrepository.com/artifact/org.jboss.resteasy/resteasy-jackson-provider -->
+<dependency>
+    <groupId>org.jboss.resteasy</groupId>
+    <artifactId>resteasy-jackson-provider</artifactId>
+    <version>3.0.11.Final</version>
+</dependency>
+
+
+
+--resteasy has also given its own client api to access the webservice:-
+
+ex:-
+
+
+public class Test{
+
+p.s.v.m(-){
+
+ClientRequest req=new ClientRequest("http://......");//service url
+
+req.accept(MediaType.APPLICATION_JSON);
+
+ClientResponse res=req.get(ClientResponse.class);
+
+String response=(String)res.getEntity(String.class);
+
+syso(response);
+
+}
+}
+
+
+
+
+
+
+
+Downloading Excel and PDF file using JAX-RS:-
+============================================
+
+	
+excel:-
+-------
+
+--the MIME type of Excel file is "application/vnd.ms-excel".
+
+--so we need to produce the file using @Produce annotaiton.
+
+--in order to attach a excel file from our hard disk,we need to use "Content-Disposition" in req header .
+
+ex:-
+
+
+
+@Path("/excel")
+public class ExcelService {
+
+	private static final String FILE_PATH = "c:\\excel-file.xls";
+
+	@GET
+	@Path("/getExcel")
+	@Produces("application/vnd.ms-excel")
+	public Response getFile() {
+
+		File file = new File(FILE_PATH);
+
+		ResponseBuilder response = Response.ok((Object) file);
+		response.header("Content-Disposition",
+			"attachment; filename=new-excel-file.xls");
+		return response.build();
+
+	}
+
+}
+
+
+
+
+--for PDF we need to change the "application/pdf" mime type.
+
+
+
+Caching:-
+=========
+
+
+--when we open the webpage for the first time,it takes some time but for second and third time it loads faster.this happens becoz whenever we visit a webpage for first time,our browser caches the content and need not have to make a call over the n/w to render it.
+
+--this caching ability of the browser saves a lot of n/w bandwith and helps in cutting down the server loads.
+
+
+--cache is hanlded in two locations:-
+
+1.brower local memory (in-memory cache):-
+
+--it is the faster cache,whenever we visit a webpage,a local copy is stored in browser and then in second time it uses this local copy,instead of making the real request over the n/w.
+
+2.using psedo web server(Proxy cache):-
+
+--this psedu webserver works as a mideator b/w browsers and websites.
+
+--this servers cache the static content and serve its clients so the client does not have to go to server for these resources.
+
+
+
+
+--when we r dealing with cache we need to make sure that the application state data is invalidated and it should be consistent.ex:- after logout,hit the back button.
+
+
+--Before Http 1.1 the only way to control caching behaviour was the help of "expires" http header.in this we specify the duration(expire date) for the cache content of the application. 
+
+--but from the http 1.1 more powerfull and extensive headers were introduced like "cache-control".
+
+--by the help of these two headers we can control the behaviour of caches.
+
+--JAX-RS provides the api to use these http headers to the control the cache behaviour.
+
+
+Expires:-
+--------
+
+--it is the simple Http Response header.it tell the browser how long it can cache an object or page.it would be a date in future after which the cache would not be valid.
+
+--JAX-RS supports this header in "javax.ws.rs.core.Response" obj.
+
+
+ex:-
+
+
+ResponseBuilder builder=Response.status(200).entity(-); 
+
+//now put the duration on Expires header of Http Response.
+
+Calander cal=Calander.getInstance();
+
+cal.set(2018,11,20,15,0);//(11-dec 2018 15.00 GMT)
+
+builder.expires(cal.getTime());
+
+return builder.build();
+
+
+---but to support the proxy cache there is a need for more enhnced http response header with richer set of features. having more explicit control,Hence in Http 1.1 new header is introduced i.e
+"cache-control" with various directives.
+
+--Expires is deprecated in Http 1.1.
+
+
+
+Cache-Control:-
+--------------
+
+--Cache-Control has a variable set of comma-delimited directives that defines who,how and for how long it can be cached.
+
+ex:-
+
+private/public:- these r the accessibility directives,private means only browser can cache the object but the proxies can not. where public means it is cacheable by all.
+
+no-cache:-
+
+no-store:-
+
+mag-age etc..
+
+
+--***JAX-RS provides "javax.rs.ws.core.CacheControl" class to represent this header.
+
+
+ex:-
+
+@GET
+public Response getEmployee(){
+
+CacheControl cc=new CacheControl();
+cc.setMaxAge(300);// seconds
+cc.setPrivate(true);
+
+ResponseBuilder builder=Response.status(200).entity(-);
+
+builder.cacheControl(cc);
+
+return builder.build(); 
+
+}
+
+
+
+
+
+
+Exception Handling in Restfull webservice:-
+==========================================
+
+
+--when a client calls the ws,and if an exception is occured in ws then bydefault that exception will be sent from ws to its client.
+
+
+--ws can be developed in one lang and its client can developed in another lang so,a client appl cannot understand a exception sent by the ws.
+
+
+--it is always better to send an obj with some message (ErrorResonse )to the client instead of directly sending exception to the client.
+
+
+--In Restfull ws,in order to map one exception to one obj(ErrorResponse obj) of a class,we need to create one "ExceptionMapper" class.
+
+--ExceptionMapper classes r created by imple a Generic type interface called ExceptionMapper(I).
+
+--these ExceptionMapper classes should be annotated with @Provider annotation.
+
+
+ex:- in the following example,if Student roll is not available an exception will be thrown by the ws.
+
+--we create an ExceptionMapper class for converting exception into one error response obj and finally error response obj will be returned to the client appl.
+
+
+
+Note:- ****take reff from servletasEnpointandApp..
+
+
+StudentNotFoundException.java:-
+----------------------------
+package com.ratan.ws.exp
+
+public class StudentNotFoundException extends Exception{
+
+public StudentNotFoundException(String msg){
+super(msg);
+}
+}
+
+
+
+StudentWebService.java:-
+----------------------
+package com.ratan.ws.myws;
+
+@Path("studentApp")
+public class StudentWebService {
+
+	@GET
+	@Path("getStudent/{roll}")
+	@Produces(MediaType.APPLICATION_XML)
+	public Response getStudent(@PathParam("roll") int roll)throws StudentNotFoundException{
+		
+		Student student=dao.getStudentByRoll(roll);
+		if(student != null){
+		System.out.println("======"+student.getName());
+		return Response.status(200).entity(student).build();
+		}
+		else
+		{
+			throw new StudentNotFoundException("Student not Found with Roll :"+roll);
+		}
+	}
+
+
+
+
+StudentNotFoundExceptionHandler:-
+--------------------------------
+package com.ratan.ws.exp;
+
+@Provider //this annotation is mandatory.
+public class StudentNotFoundExceptionHandler imple ExceptionMapper<StudentNotFoundException>
+{
+
+public Response toResponse(StudentNotFoundException exp){
+
+
+//send the error message in JSON format  
+return Resposne.status(Status.BAD_REQUEST).entity(exp.getMessage()).type(MediaType.Application_JSON).build();
+
+//or as normal text message.
+
+//return Resposne.status(Status.BAD_REQUEST).entity(exp.getMessage()).build();
+
+
+}
+}
+
+
+
+Note:- after creating ExceptionMapper class we need to cfg this class in:- 
+
+1. web.xml (this class containing package) along with ws containing package by semicolon seperating.
+
+ex:-
+
+<web-app>
+
+<servlet>
+
+   <servlet-name>one</servlet-name>
+<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+
+<init-param>
+<param-name>jersey.config.server.provider.packages</param-name>
+<param-value>com.ratan.ws.myws;com.ratan.ws.exp</param-value>
+</init-param>
+
+<load-on-startup>1</load-on-startup>
+
+</servlet>
+
+--
+--
+</web-app>
+
+
+2.if we r not using web.xml then add that ExceptionMapper obj in Application class:-
+
+ex:-
+
+
+@ApplicationPath("rest")
+public class MyWsCfg extends Application{
+
+	private Set set;
+	public MyWsCfg() {
+		set=new HashSet();
+		set.add(new StudentWebService());
+		set.add(new StudentNotFoundExceptionHandler());
+	}
+	
+	@Override
+	public Set<Object> getSingletons() {
+		
+		return set;
+	}
+}
+
+
+
+3.or if with ResourceConfig cfg class then 
+
+
+ex:-
+
+
+@ApplicationPath("rest")
+public class MyWsCfg extends ResourceConfig{
+
+	
+	public MyWsCfg() {
+		packages("com.ratan.ws.myws","com.ratan.ws.exp");
+	}
+
+}
+
+
+
+Servlet client for above service:-(if console client then write the following code in main method)
+==================================
+
+public class MyClientDemo{
+
+doGet(--){
+
+
+	int roll=Integer.parseInt(request.getParameter("roll").trim());
+	
+	Client client=ClientBuilder.newClient();
+		
+		WebTarget wt=client.target									("http://localhost:8088/jersey2finalservice/rest/studentApp/getStudent/"+roll);
+		
+		Response rs=wt.request().get();
+		
+		if(rs.getStatus() != 200){
+	
+			String msg=rs.readEntity(String.class);
+			System.out.println(msg);
+			
+			response.getWriter().print("<h1>"+msg+"</h1>");
+		}
+		
+		else{
+			Student student=rs.readEntity(Student.class);
+			System.out.println(student.getMarks());
+			String result="<h2>Roll :"+student.getRoll()+" Name :"+student.getName()+" 				Marks :"+student.getMarks()+"</h2>";
+
+			request.setAttribute("result", result);
+			request.getRequestDispatcher("/r_GetStudent.jsp").forward(request, response);
+			
+		}
+					
+}
+}
+
+
+
+
+
+
+Creating Asynchronous Client for RestFull Webservice:-
+=======================================================
+
+
+--we can create two types of client to call Restfull webservice:-
+
+1.synchronous client
+
+2.Asynchronous Client
+
+
+
+--Synchronous client waits for a response from server and Asynch client will continue its exceution by without waiting for the response.
+
+
+--to make a client application as Asyn client,we need to do following 2 changes:-
+
+1.create a class by imple InvocationCallback interface and overrides 2 abstract methods:-
+
+a.completed(Response T)
+
+b.failed(Throwable t)
+
+2.send the req to the target asynchronously by calling async() method.
+
+ex:-
+
+target.request().async().get(new ResposneCallback());
+
+
+ex:-
+
+create the dynamic webproject and convert it as maven project then add the jersey2 related 3 dependency
+
+
+
+asyncRestApp
+	|
+	|--com.ratan.ws
+		      |--DemoService.java
+		      |--MyWsCfg.java
+	|
+	|--com.ratan.ws.client
+			    |--ResponseCallback.java
+			    |--ClientMain.java
+
+
+
+
+DemoService.java:-
+-----------------
+
+package com.ratan.ws;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+@Path("/demo")
+public class DemoService {
+
+	
+	@GET
+	@Path("hello")
+	public String sayHello(){
+		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		return "Hello......";		
+	}	
+}
+
+
+
+MyWsCfg.java:-
+-------------
+
+package com.ratan.ws;
+
+import javax.ws.rs.ApplicationPath;
+
+import org.glassfish.jersey.server.ResourceConfig;
+
+@ApplicationPath("rest")
+public class MyWsCfg extends ResourceConfig{
+
+	public MyWsCfg() {
+		packages("com.ratan.ws");
+	}
+}
+
+
+
+
+ResponseCallback.java:-
+----------------------
+
+package com.ratan.ws.client;
+
+import javax.ws.rs.client.InvocationCallback;
+import javax.ws.rs.core.Response;
+
+public class ResponseCallback implements InvocationCallback<Response>{
+
+	@Override
+	public void completed(Response r) {
+		String str=r.readEntity(String.class);
+		
+		System.out.println(str);
+	}
+
+	@Override
+	public void failed(Throwable t) {
+		System.out.println("failed to call...");
+		t.printStackTrace();
+	}	
+}
+
+
+ClientMain.java:-
+----------------
+
+package com.ratan.ws.client;
+
+import javax.ws.rs.client.AsyncInvoker;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+
+public class ClientMain {
+
+	public static void main(String[] args) {
+		
+		Client client=ClientBuilder.newClient();
+		
+		WebTarget target=client.target("http://localhost:8088/asyncRestApp/rest/demo/hello/");
+		
+		AsyncInvoker ai=target.request().async();
+		
+		ai.get(new ResponseCallback());
+		
+		System.out.println("i am executing");
+		System.out.println("i am also executing");
+		System.out.println("i am too executing...");
+		
+	}		
+}
+
+
+
+
+
+
+Security in Restfull Webservice:-
+================================
+
+=======================
+
+
+--there r two main areas for securities:-
+
+1.Authentication:- checking the identity of the user is called Authentication,
+
+
+2.Authorization:- checking the access permission of user on perticular resource of the appl is called Authorization.
+
+
+Different types of Authentication:-
+-----------------------------------
+
+1.BASIC Authentication:-
+-----------------------
+
+--it is the simplest type and mostly used technique.
+
+--we use login password forms,we input username and password and submit the form to the server,and application identify us as authenticated user else we get an error message.
+
+--it is used for basic authentacation only.
+
+--the main problem with this security implementation is that credentials will propagate in a plain way from client to server.credentials e merely encoded with Base64 in tansit,but not encrypted or hashed.so any sniffer/hacker could read the sent packages over the network.
+
+
+2.DIGEST authentication:-
+------------------------
+
+--this authentication technique makes use of hashing algoritms to encrypt the password entered by user before sending it to the server.
+
+--it is mush safer than BASIC authentication method.
+
+
+3.CLIENT CERT Authentication:-(Client certificate authentication)
+-----------------------------
+
+--in this technique a trust agreement is established between the server and the client through certificates. 
+
+--A client digital certificate or client certificate is basically a file, usually protected with a password and loaded unto a client application (usually as PKCS12 files with the .p12 or .pfx extension).
+
+--A client certificate would typically contain pertinent information like a digital signature, expiration date, name of client, name of CA (Certificate Authority), revocation status, SSL/TLS version number, serial number, and possibly more, all structured using the X.509 standard.
+
+
+--when client submits the ceritficate for authentication,Upon receiving the certificate, the server would then use it to identify the certificate's source and determine whether the client should be allowed access.
+
+
+--If a server's enabled with client certificate authentication, only users who attempt to connect from clients loaded with the right client certificates will succeed. Even if a legitimate user attempts to connect with the right username and password, if that user isn't on a client application loaded with the right client certificate, that user will not be granted access. In fact, if that user's connecting from a Web browser, the login page (where he's supposed to enter his username and password) might not even load at all. 
+
+
+--this ceritficate must be signed by an agency which is called CA(Certificate Authority) to ensure that the certificate prsented for authentication is legitimate.
+
+
+reffer Client Cert.txt from class n final.
+
+
+=========================
+
+
+
+--in order to restrict unathorized client to access a Restfull web service ,we can provide security in 3 ways:-
+
+1.using declarative (using web.xml) to define security configuration.
+
+2.using javax.ws.rs.core.SecurityContext interface to implement security programatically.
+
+3.using Annotations in JAX-RS classes
+
+
+
+1.Declarative Security:-
+-----------------------
+
+--in this type of security we need to cfg security tags in web.xml along with the configuration of Servlet given by implementation of JAX-RS api.(Jersey or RESTEasy).
+
+--in this web.xml file define <security-constraint> tag for each set of Restfull resource that we want to protect.
+
+
+--use <login-config> tag to define the type of authentication we want to use and the security realam to which the security constraints will be applied.
+
+
+
+ex:-
+
+
+<security-constraint>
+	|
+	|--<web-resource-collection>
+	|			|
+	|			|--<web-resource-name>
+	|			|--<url-pattern>
+	|
+	|--<auth-constraint>
+			|
+			|--<role-name>
+
+
+<login-config>
+	|
+	|--<auth-method>
+
+
+
+
+
+Note:- a 'role-name' indicates a group of usernames and passwords which r authorized to access the  
+secured resource.
+
+
+--in case of a secured resource,if the client is a browser then,browser opens the dialog box to accept username and password.
+
+
+ex:-
+
+exApp:-
+
+
+first open the tomcat-users.xml and add the following roles:-
+
+<role rolename="student"/>
+
+<user password="12345" roles="student" username="ratan"/>
+
+
+secureRest1
+	|
+	|--com.ratan.ws
+		      |--HelloService.java
+	|--WEB-INF
+		|--web.xml
+
+
+HelloService.java:-
+------------------
+
+package com.ratan.ws;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+
+@Path("myapp")
+public class HelloService {
+
+	@GET
+	@Path("hello")
+	public String sayHello(){
+		return "Hello.....";
+	}	
+}
+
+
+
+web.xml:-
+---------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<servlet>
+
+		<servlet-name>one</servlet-name>
+		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+
+		<init-param>
+			<param-name>jersey.config.server.provider.packages</param-name>
+			<param-value>com.ratan.ws</param-value>
+		</init-param>
+
+		<load-on-startup>1</load-on-startup>
+
+	</servlet>
+
+
+	<servlet-mapping>
+
+		<servlet-name>one</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+
+	</servlet-mapping>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>abcd</web-resource-name>
+			<url-pattern>/rest/myapp/*</url-pattern>
+		</web-resource-collection>
+
+		<auth-constraint>
+			<role-name>student</role-name>
+		</auth-constraint>
+
+
+	</security-constraint>
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+
+</web-app>
+
+
+
+--run the above application and from the browser give the following request:-
+
+http://localhost:8088/secureRest1/rest/myapp/hello
+
+
+Note:- while sending a request to the RestFull webservice from the client appl(console client) in order to send the credentials(username,password) we should follow given steps:-
+
+1.creata an obj of "HttpAuthenticationFeature" class and add the credentials to it.
+
+2.Register HttpAuthenticationFeature obj with Client obj.
+
+
+ex:-
+
+
+public class TestMain{
+
+p.s.v.m(--){
+
+HttpAuthenticationFeature feature=HttpAuthenticationFeature.basicBuilder().nonPremptive().credentials("ratan","12345").bulid();
+
+Client client=ClientBuilder.newInstance();
+
+client.register(feature);
+
+WebTarget wt=client.target("http://localhost:8088/secureRest1/rest/myapp/hello");
+
+Response r=wt.request().get();
+
+String str=r.readEntity(String.class);
+
+System.out.println(str);
+
+}
+
+}
+
+
+
+
+2.Securing Restful webservices using Annotations:-
+--------------------------------------------------
+
+
+--javax.annotation.security package provides following annotations using which we can provide security on Restfull webservice.
+
+--**Annotation approach is the extension of web.xml security approach,here also web.xml file is mandatory.
+
+--with the help of Annotation we can override the security cfg in web.xml.
+
+
+@PermitAll:- it specifies that all security roles r allowed to invoke the specified methods.
+
+@DenyAll:- it specifies that no security roles r allowed to invoke the specified methods.
+
+@RolesAllowed:-specifies the list of security roles that r allowed to invoke the methods in the application.
+
+
+
+Note:- to support the above annotations we need to register class obj of "RolesAllowedDynamicFeature"
+with out application.
+
+ex:-
+
+create two roles in tomcat :-
+
+student
+
+emp
+
+ex:-
+
+ <role rolename="student"/>
+ <role rolename="emp"/>
+
+<user password="12345" roles="student" username="ratan"/>
+<user password="emp" roles="emp" username="emp"/>
+ 
+
+
+
+
+secureRest2
+	|
+	|--com.ratan.ws
+		      |--HelloService.java
+
+	|--com.ratan.ws.cfg
+		|--MyWsCfg.java
+	|
+	|--WEB-INF
+		|--web.xml
+
+
+
+
+web.xml:-
+--------
+
+<web-app>
+
+<security-constraint>
+		
+	<web-resource-collection>
+		<web-resource-name>abcd</web-resource-name>
+		<url-pattern>/rest/myapp/*</url-pattern>
+	</web-resource-collection>
+
+	<auth-constraint>
+		<role-name>student</role-name>
+		<role-name>emp</role-name>
+	</auth-constraint>
+
+</security-constraint>
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+</web-app>
+
+
+
+HelloService.java:-
+------------------
+
+package com.ratan.ws;
+
+import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+
+@Path("myapp")
+public class HelloService {
+
+	@GET
+	@Path("hello")
+	@RolesAllowed("student")
+	public String sayHello(){
+		return "Hello.....";
+	}
+
+	@GET
+	@Path("bye")
+	@RolesAllowed("emp")
+	public String sayBye(){
+		return "Bye.....";
+	}
+	
+}
+
+
+
+MyWsCfg.java:-
+--------------
+
+package com.ratan.ws.cfg;
+
+import javax.ws.rs.ApplicationPath;
+
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+
+@ApplicationPath("rest")
+public class MyWsCfg extends ResourceConfig
+{
+	public MyWsCfg(){
+
+		register(RolesAllowedDynamicFeature.class);
+		packages("com.ratan.ws");
+
+	}
+}
+
+
+
+
+
+3.Securing Restful WS using SecurityContext:-
+-------------------------------------------
+
+
+--javax.ws.rs.core.SecurityContext(I) interface provides access to security related information for a request.ex:-
+
+
+1.java.security.Principle obj containing the name of the user making the request.
+
+2.Authentication type used to secure the resource,such as BASIC_AUTH,DIGEST,CLIENT_CERT_AUTH,etc..
+
+3.whether the authenticated user is included in a perticular role.
+
+4.whether a request is made using a secure channel such as HTTPS.
+
+
+--we can access the SecurityContext by injecting an instance into a class feild,setter method or method parameter using the @Context annotation.
+
+
+ex:-
+
+secureRest2
+	|
+	|--com.ratan.ws
+		      |--HelloService.java
+
+	|--com.ratan.ws.cfg
+		|--MyWsCfg.java
+	|
+	|--WEB-INF
+		|--web.xml
+
+
+
+
+Note:- roles in tomcat and web.xml same as prev application
+
+
+HelloService.java:-
+------------------
+
+package com.ratan.ws;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
+
+
+@Path("myapp")
+public class HelloService {
+
+	@GET
+	@Path("hello")
+	public String sayHello(@Context SecurityContext sc){
+		if(sc.isUserInRole("student")){
+		return "Hello.....";
+		}
+		else{
+			return "please login as student";
+		}
+	}
+
+	@GET
+	@Path("bye")
+	public String sayBye(@Context SecurityContext sc){
+		if(sc.isUserInRole("emp")){
+			return "Bye.....";
+			}
+			else{
+				return "please login as employee";
+			}	}
+	
+}
+
+
+
+
+MyWsCfg.java:-(registering of RolesAllowedDynamicFeature not required)
+-------------
+
+package com.ratan.ws.cfg;
+
+import javax.ws.rs.ApplicationPath;
+
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+
+@ApplicationPath("rest")
+public class MyWsCfg extends ResourceConfig
+{
+public MyWsCfg(){
+
+//register(RolesAllowedDynamicFeature.class);
+packages("com.ratan.ws");
+
+}
+}
+
+
+
+
+		
